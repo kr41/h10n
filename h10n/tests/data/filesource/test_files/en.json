@@ -1,0 +1,10 @@
+[
+    {"namespace": "day"},
+    {"id": "sunday", "msg": "Sunday"},
+    {"id": "monday", "msg": "Monday"},
+    {"id": "tuesday", "msg": "Tuesday"},
+    {"id": "wednesday", "msg": "Wednesday"},
+    {"id": "thursday", "msg": "Thursday"},
+    {"id": "friday", "msg": "Friday"},
+    {"id": "saturday", "msg": "Saturday"}
+]
