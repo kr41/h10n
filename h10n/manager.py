@@ -1,5 +1,3 @@
-from threading import local
-
 from h10n.exception import NotConfigured
 from h10n.helper import HelperManager
 from h10n.translator import Translator
@@ -68,11 +66,12 @@ class LocaleManager(object):
                 for thread local mode.
         """
         if mode == self.SIMPLE:
-            self._simple_mode()
+            storage = _simple_storage()
         elif mode == self.THREAD_LOCAL:
-            self._thread_local_mode()
+            storage = _thread_local_storage()
         else:
             raise ValueError("Invalid mode '{0}'".format(mode))
+        self._storage = storage
         self.locales = locales
         self.default = locales[0]
         self._configured = True
@@ -92,30 +91,17 @@ class LocaleManager(object):
         Attempt to setup value that is not supported locale value
         raises ``ValueError``
         """
-        return self._get_locale()
+        return self._storage.__dict__.get('locale', self.default)
 
     @locale.setter
     def locale(self, locale):
         if locale not in self.locales:
             raise ValueError("Unsupportable locale '{0}'".format(locale))
-        self._set_locale(locale)
+        self._storage.locale = locale
 
-    def _simple_mode(self):
-        """ Setup Locale Manager simple (non-threading) usage """
-        self._locale = None
-        def getter():
-            return self._locale or self.default
-        def setter(locale):
-            self._locale = locale
-        setattr(self, '_get_locale', getter)
-        setattr(self, '_set_locale', setter)
 
-    def _thread_local_mode(self):
-        """ Setup Locale Manager thread local usage """
-        self._locals = local()
-        def getter():
-            return self._locals.__dict__.get('_locale') or self.default
-        def setter(locale):
-            self._locals._locale = locale
-        setattr(self, '_get_locale', getter)
-        setattr(self, '_set_locale', setter)
+from threading import local as _thread_local_storage
+
+class _simple_storage(object):
+    """ An utility class to store values """
+    pass
