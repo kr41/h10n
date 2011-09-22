@@ -27,6 +27,18 @@ def unsupported_locale_test():
     lm.configure(locales=('en', 'ru'))
     lm.locale = 'cn'
 
+def lang_test():
+    """  """
+    lm = LocaleManager()
+    lm.configure(locales=('en-us',))
+    tools.eq_(lm.lang, 'en')
+
+def country_test():
+    """  """
+    lm = LocaleManager()
+    lm.configure(locales=('en-us',))
+    tools.eq_(lm.country, 'us')
+
 def registry_test():
     """ Registry of ``LocaleManager`` """
     def first_call():

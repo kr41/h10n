@@ -91,14 +91,48 @@ class LocaleManager(object):
         Attempt to setup value that is not supported locale value
         raises ``ValueError``
         """
-        return self._storage.__dict__.get('locale', self.default)
+        self._check_locale()
+        return self._storage.locale
 
     @locale.setter
     def locale(self, locale):
         if locale not in self.locales:
             raise ValueError("Unsupportable locale '{0}'".format(locale))
-        self._storage.locale = locale
+        self._set_locale(locale)
 
+    @property
+    def country(self):
+        """ Current country.
+
+        If locale is in format ``xx-yy`` (for example ``en-us``),
+        this property conatains ``yy``.
+        Otherwise, this value is equal to current locale.
+        """
+        self._check_locale()
+        return self._storage.country
+
+    @property
+    def lang(self):
+        """ Current language.
+
+        If locale is in format ``xx-yy``, (for example ``en-us``)
+        this property conatains ``xx``.
+        Otherwise, this value is equal to current locale.
+        """
+        self._check_locale()
+        return self._storage.lang
+
+    def _set_locale(self, locale):
+        """ Set locale value """
+        self._storage.locale = locale
+        if '-' in locale:
+            self._storage.lang, self._storage.country = locale.split('-')
+        else:
+            self._storage.lang = self._storage.country = locale
+
+    def _check_locale(self):
+        if not hasattr(self._storage, 'locale'):
+            self._set_locale(self.default)
 
 from threading import local as _thread_local_storage
 
