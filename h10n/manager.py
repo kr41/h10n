@@ -72,7 +72,9 @@ class LocaleManager(object):
         else:
             raise ValueError("Invalid mode '{0}'".format(mode))
         self._storage = storage
-        self.locales = locales
+        if isinstance(locales, basestring):
+            locales = locales.split(',')
+        self.locales = tuple(locales)
         self.default = locales[0]
         self._configured = True
 
@@ -133,7 +135,7 @@ class LocaleManager(object):
     def _check_locale(self):
         """ Check storage
 
-        If storage is not initialized, set default locale
+        If storage is not initialized, set default locale.
         """
         if not hasattr(self._storage, 'locale'):
             self._set_locale(self.default)
