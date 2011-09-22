@@ -131,6 +131,10 @@ class LocaleManager(object):
             self._storage.lang = self._storage.country = locale
 
     def _check_locale(self):
+        """ Check storage
+
+        If storage is not initialized, set default locale
+        """
         if not hasattr(self._storage, 'locale'):
             self._set_locale(self.default)
 
