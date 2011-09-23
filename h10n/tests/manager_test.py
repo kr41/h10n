@@ -28,13 +28,13 @@ def unsupported_locale_test():
     lm.locale = 'cn'
 
 def lang_test():
-    """  """
+    """ ``lang`` property of ``LocaleManager`` """
     lm = LocaleManager()
     lm.configure(locales='en-us')
     tools.eq_(lm.lang, 'en')
 
 def country_test():
-    """  """
+    """ ``country`` property of ``LocaleManager`` """
     lm = LocaleManager()
     lm.configure(locales='en-us')
     tools.eq_(lm.country, 'us')
