@@ -2,7 +2,7 @@
 
 from nose import tools
 
-from h10n.message import Message
+from h10n.server.message import Message
 
 
 class Helpers(object):

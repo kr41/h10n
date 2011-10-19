@@ -3,7 +3,7 @@
 Provides function to build Localized Messages.
 """
 
-from h10n.filter import FilterChain
+from h10n.server.filter import FilterChain
 
 
 class Message(object):

@@ -2,7 +2,7 @@
 
 from nose import tools
 
-from h10n.filter import FilterChain
+from h10n.server.filter import FilterChain
 
 
 class Helpers(object):
