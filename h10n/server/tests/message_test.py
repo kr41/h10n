@@ -44,12 +44,10 @@ def setup():
     locale = Locale('en-US')
     prototype = Message(locale)
 
-#
-# Format testing
-###############################################################################
 
-def simple_format_test():
-    """ Simple format """
+def format_test():
+    """ The Message Module: Format Test """
+    # Simple format
     definition = {
         'id': 'test',
         'msg': 'Message'
@@ -58,8 +56,7 @@ def simple_format_test():
     result = message.format()
     tools.eq_(result, 'Message')
 
-def params_test():
-    """ Format using default parameters and passed ones """
+    # Format using default parameters and passed ones
     definition = {
         'id': 'test',
         'defaults': {'a': 1, 'b': 2},
@@ -69,8 +66,7 @@ def params_test():
     result = message.format(b=20, c=30)
     tools.eq_(result, 'Message 1 20 30')
 
-def filters_and_key_test():
-    """ Format using key and filters """
+    # Format using key and filters
     definition = {
         'id': 'test',
         'defaults': {'count': 1},
@@ -88,12 +84,8 @@ def filters_and_key_test():
     tools.eq_(result, '2 messages')
 
 
-#
-# Extension testing
-###############################################################################
-
-def implicit_extend_test():
-    """ Implicit extension of filters """
+def extension_test():
+    """ The Message Module: Filters Extension Test """
     definition = {
         'id': 'parent',
         'filters': [
@@ -102,6 +94,8 @@ def implicit_extend_test():
         'msg': '{a}'
     }
     parent = prototype.clone(**definition)
+
+    # Implicit extension of filters
     definition = {
         'id': 'test',
         'filters': [
@@ -113,16 +107,7 @@ def implicit_extend_test():
     result = message.format(a=3, b=3)
     tools.eq_(result, '18')
 
-def explicit_extend_test():
-    """ Explicit extension of filters """
-    definition = {
-        'id': 'parent',
-        'filters': [
-            ('add', ['{a}', '{b}'], '{a}'),
-        ],
-        'msg': '{a}'
-    }
-    parent = prototype.clone(**definition)
+    # Explicit extension of filters
     definition = {
         'id': 'test',
         'filters': [
@@ -135,16 +120,7 @@ def explicit_extend_test():
     result = message.format(a=3, b=3)
     tools.eq_(result, '12')
 
-def override_test():
-    """ Overriding Prototype's filters """
-    definition = {
-        'id': 'parent',
-        'filters': [
-            ('add', ['{a}', '{b}'], '{a}'),
-        ],
-        'msg': '{a}'
-    }
-    parent = prototype.clone(**definition)
+    # Overriding prototype's filters
     definition = {
         'id': 'test',
         'filters': [
@@ -158,12 +134,10 @@ def override_test():
     tools.eq_(result, '9')
 
 
-#
-# Filter compilation testing
-###############################################################################
+def compilation_test():
+    """ The Message Module: Filter Compilation Test """
 
-def multiple_result_test():
-    """ Multiple filter result """
+    # Process multiple filter result
     definition = {
         'id': 'test',
         'filters': [
@@ -175,8 +149,7 @@ def multiple_result_test():
     result = message.format(a=1, b=2)
     tools.eq_(result, '2 1')
 
-def positional_args_test():
-    """ Passing to filter postional arguments """
+    # Passing to filter positional arguments
     definition = {
         'id': 'test',
         'filters': [
@@ -188,8 +161,7 @@ def positional_args_test():
     result = message.format(a=1, b=2)
     tools.eq_(result, '1, 2')
 
-def positional_args_test_marginal_case():
-    """ Passing to filter single postional argument """
+    # Passing to filter single postional argument
     definition = {
         'id': 'test',
         'filters': [
@@ -201,8 +173,7 @@ def positional_args_test_marginal_case():
     result = message.format(a=1)
     tools.eq_(result, '1')
 
-def empty_map_test():
-    """ Passing to filter no arguments """
+    # Passing to filter no arguments
     definition = {
         'id': 'test',
         'filters': [
@@ -214,8 +185,7 @@ def empty_map_test():
     result = message.format()
     tools.eq_(result, '')
 
-def keyword_args_test():
-    """ Passing to filter keyword arguments """
+    # Passing to filter keyword arguments
     definition = {
         'id': 'test',
         'filters': [
@@ -227,8 +197,7 @@ def keyword_args_test():
     result = message.format(a=1, b=2)
     tools.eq_(result, 'a=1, b=2')
 
-def mixed_args_test():
-    """ Passing to filter keyword and positional arguments """
+    # Passing to filter keyword and positional arguments
     definition = {
         'id': 'test',
         'filters': [
@@ -240,8 +209,7 @@ def mixed_args_test():
     result = message.format(a=1, b=2)
     tools.eq_(result, '1, 2, a=1, b=2')
 
-def mixed_args_test_marginal_case():
-    """ Passing to filter keyword arguments and single positional one """
+    # Passing to filter keyword arguments and single positional one
     definition = {
         'id': 'test',
         'filters': [
@@ -253,8 +221,7 @@ def mixed_args_test_marginal_case():
     result = message.format(a=1, b=2)
     tools.eq_(result, '1, a=1, b=2')
 
-def passing_primitives_test():
-    """ Passing to filter primitive datatype """
+    # Passing to filter primitive datatypes via arguments
     definition = {
         'id': 'test',
         'filters': [
@@ -266,8 +233,7 @@ def passing_primitives_test():
     result = message.format()
     tools.eq_(result, "None, False, True, 'string'")
 
-def get_attribute_test():
-    """ Passing to filter value of argument's attribute """
+    # Passing to filter value of argument's attribute """
     definition = {
         'id': 'test',
         'filters': [
@@ -280,12 +246,9 @@ def get_attribute_test():
     tools.eq_(result, "Locale is 'en-US'")
 
 
-#
-# Exception testing
-###############################################################################
-
-def invalid_defaults_test():
-    """ Process invalid defaults """
+def exception_test():
+    """ The Message Module: Exception Test """
+    # Process invalid defaults
     definition = {
         'id': 'test',
         'defaults': 100,
@@ -298,8 +261,7 @@ def invalid_defaults_test():
         debug = e.args[-1]
     tools.eq_(debug, '<Message: en-US.test>')
 
-def invalid_filters_test():
-    """ Process invalid filters """
+    # Process invalid filters
     definition = {
         'id': 'test',
         'filters': [('invalid', [], '{result}')],
