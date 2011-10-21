@@ -26,6 +26,15 @@ class Context(object):
         # Create new context and add it to the end of exception's arguments
         exception.args += (cls(obj),)
 
+class NamedContext(object):
+
+    def __init__(self, type, name):
+        self.type = type
+        self.name = name
+
+    def __repr__(self):
+        return '<{0}: {1}>'.format(self.type, self.name)
+
 def keep_context(**kw):
     """ Includes context into exception raised from decorated function """
     def decorator(method):
@@ -34,6 +43,8 @@ def keep_context(**kw):
                 return method(*args, **kwargs)
             except Exception, e:
                 obj = kw.get('context', None)
+                # If context is not provided explicit get first argument,
+                # usually ``self``
                 if obj is None and args:
                     obj = args[0]
                 Context.extend(e, obj)

@@ -3,12 +3,18 @@
 Provides function to build Localized Messages.
 """
 
+from textwrap import dedent
+
+from h10n.exception import keep_context
+from h10n.exception import Context
+from h10n.exception import NamedContext
+
+
 class Message(object):
     """ Localized Message """
 
     def __init__(self, locale, id='__prototype__'):
         self.id = id
-        self.fullname = '{0}.{1}'.format(locale.name, id)
         self.locale = locale
         self.key = None
         self.msg = None
@@ -16,11 +22,12 @@ class Message(object):
         self.filters = []
 
     def __repr__(self):
-        return '<Message: {0}>'.format(self.fullname)
+        return '<Message: {0}>'.format(self.id)
 
+    @keep_context()
     def clone(self, id, key=None, msg=None, defaults=None, filters=None):
+        result = self.__class__(self.locale, id)
         try:
-            result = self.__class__(self.locale, id)
             result.key = key or self.key
             result.msg = msg or self.msg
             result.defaults.update(self.defaults)
@@ -28,9 +35,10 @@ class Message(object):
             result.filters = self._compile_filters(filters or [])
             return result
         except Exception, e:
-            e.args = e.args + (repr(result),)
+            Context.extend(e, result)
             raise
 
+    @keep_context()
     def format(self, **kw):
         """ Format Message according to passed parameters """
         params = self.defaults.copy()
@@ -43,7 +51,11 @@ class Message(object):
             msg = msg[key]
         return msg.format(**params)
 
-    _filter_template = 'def f(kw): ({output}) = helper(self.locale, {input})'
+    _filter_template = dedent("""
+        @keep_context(context=NamedContext('Filter', helper_name))
+        def f(kw):
+            {output} = helper(self.locale, {input})
+    """)
 
     def _compile_filters(self, filters):
         """ Setup Filters """
@@ -65,10 +77,10 @@ class Message(object):
                 input = self._map(input)
                 output = self._map(output)
                 code = self._filter_template.format(input=input, output=output)
-                exec code in locals()
+                exec code in locals(), globals()
                 result.append(f)
             except Exception, e:
-                e.args = e.args + ('<Filter: {0}>'.format(helper_name),)
+                Context.extend(e, NamedContext('Filter', helper_name))
                 raise
         return result
 

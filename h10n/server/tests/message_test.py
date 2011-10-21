@@ -259,7 +259,10 @@ def exception_test():
         message = prototype.clone(**definition)
     except Exception, e:
         debug = e.args[-1]
-    tools.eq_(debug, '<Message: en-US.test>')
+    tools.eq_(
+        repr(debug),
+        '<Context: [<Message: __prototype__>, <Message: test>]>'
+    )
 
     # Process invalid filters
     definition = {
@@ -271,5 +274,9 @@ def exception_test():
     try:
         message = prototype.clone(**definition)
     except Exception, e:
-        debug = e.args[-2:]
-    tools.eq_(debug, ('<Filter: invalid>', '<Message: en-US.test>'))
+        debug = e.args[-1]
+    tools.eq_(
+        repr(debug),
+        '<Context: [<Message: __prototype__>, '
+                   '<Message: test>, <Filter: invalid>]>'
+    )
