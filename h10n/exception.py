@@ -21,10 +21,12 @@ class Context(object):
         # Search for existent context in exception arguments
         for arg in reversed(exception.args):
             if isinstance(arg, cls):
-                arg.chain.append(obj)
-                return
+                if repr(arg.chain[-1]) != repr(obj):
+                    arg.chain.append(obj)
+                raise
         # Create new context and add it to the end of exception's arguments
         exception.args += (cls(obj),)
+        raise
 
 class NamedContext(object):
 
@@ -48,7 +50,6 @@ def keep_context(**kw):
                 if obj is None and args:
                     obj = args[0]
                 Context.extend(e, obj)
-                raise
         context_keeper.__name__ = method.__name__
         context_keeper.__doc__ = method.__doc__
         return context_keeper

@@ -36,7 +36,6 @@ class Message(object):
             return result
         except Exception, e:
             Context.extend(e, result)
-            raise
 
     @keep_context()
     def format(self, **kw):
@@ -81,7 +80,6 @@ class Message(object):
                 result.append(f)
             except Exception, e:
                 Context.extend(e, NamedContext('Filter', helper_name))
-                raise
         return result
 
     def _map(self, map):
