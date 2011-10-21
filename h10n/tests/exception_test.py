@@ -1,6 +1,7 @@
 from nose import tools
 
 from h10n.exception import keep_context
+from h10n.exception import Context
 
 
 class Item(object):
@@ -43,6 +44,17 @@ def context_test():
     @keep_context(context=container)
     def func():
         raise Exception('Test context')
+    context = None
+    try:
+        func()
+    except Exception, e:
+        context = e.args[-1]
+    tools.eq_(repr(context), '<Context: [<Container: 1>]>')
+
+    # Test duplicat context name
+    @keep_context(context=container)
+    def func():
+        raise Exception('Test context', Context(container))
     context = None
     try:
         func()
