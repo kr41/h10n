@@ -7,11 +7,24 @@ from h10n.exception import Context
 class Server(object):
     """ Localization Server """
 
-    def __init__(self, locales):
-        self.locales = {}
-        for name, locale in locales.iteritems():
-            self.locales[name] = Locale(name=name, **locale)
+    def __init__(self, locales, helpers=None, name='__default__'):
+        self.name = name
+        try:
+            self.helpers = dict(helpers or {})
+            self.locales = {}
+            for name, locale in locales.iteritems():
+                try:
+                    self.locales[name] = Locale(name=name, server=self,
+                                                **locale)
+                except Exception, e:
+                    Context.extend(e, NamedContext('Locale', name))
+        except Exception, e:
+            Context.extend(e, self)
 
+    def __repr__(self):
+        return '<Server: {0}>'.format(self.name)
+
+    @keep_context()
     def __getitem__(self, name):
         if '.' in name:
             name, tail = name.split('.', 1)
@@ -22,9 +35,11 @@ class Server(object):
 class Locale(object):
     """ Locale """
 
-    def __init__(self, name, catalogs):
+    def __init__(self, name, server, catalogs, helpers=None):
         self.name = name
         try:
+            self.server = server
+            self.helpers = dict(helpers or {})
             self.lang, self.country = name.split('-')
             self.catalogs = {'__prototype__': Message(locale=self)}
             for catalog_name, catalog in catalogs.iteritems():
@@ -41,7 +56,7 @@ class Locale(object):
                 except Exception, e:
                     Context.extend(e, NamedContext('Catalog', catalog_name))
         except Exception, e:
-            Context.extend(e, NamedContext('Locale', name))
+            Context.extend(e, self)
 
     def __repr__(self):
         return '<Locale: {0}>'.format(self.name)
@@ -53,8 +68,9 @@ class Locale(object):
             return self.catalogs[name][tail]
         return self.catalogs[name]
 
+    @keep_context()
     def get_helper(self, name):
-        pass
+        return self.helpers.get(name) or self.server.helpers[name]
 
 
 class Catalog(object):
@@ -92,7 +108,7 @@ class Catalog(object):
             else:
                 raise ValueError('Invalid strategy "{0}"'.format(strategy))
         except Exception, e:
-            Context.extend(e, NamedContext('Catalog', name))
+            Context.extend(e, self)
 
     def __repr__(self):
         return '<Catalog: {0}>'.format(self.name)
