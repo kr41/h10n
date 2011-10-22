@@ -3,7 +3,8 @@ from nose import tools
 from h10n.server.server import Server
 
 
-def locale_test():
+def server_test():
+    """ Localization Server Test """
     server = Server(
         {
             'en-US': {
