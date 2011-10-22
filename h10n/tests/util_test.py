@@ -1,7 +1,7 @@
 from nose import tools
 
-from h10n.exception import keep_context
-from h10n.exception import Context
+from h10n.util import keep_context
+from h10n.util import Context
 
 
 class Item(object):

@@ -1,8 +1,8 @@
 from textwrap import dedent
 
-from h10n.exception import keep_context
-from h10n.exception import NamedContext
-from h10n.exception import Context
+from h10n.util import keep_context
+from h10n.util import NamedContext
+from h10n.util import Context
 
 
 class Server(object):
