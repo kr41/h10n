@@ -4,6 +4,7 @@ from h10n.util import keep_context
 from h10n.util import NamedContext
 from h10n.util import Context
 
+from h10n.helpers import GenericHelpers
 
 class Server(object):
     """ Localization Server """
@@ -11,7 +12,8 @@ class Server(object):
     def __init__(self, locales, helpers=None, name='__default__'):
         self.name = name
         try:
-            self.helpers = dict(helpers or {})
+            self.helpers = {'generic': GenericHelpers()}
+            self.helpers.update(helpers or {})
             self.locales = {}
             for name, locale in locales.iteritems():
                 try:
@@ -40,7 +42,7 @@ class Locale(object):
         self.name = name
         try:
             self.server = server
-            self.helpers = dict(helpers or {})
+            self.helpers = helpers or {}
             self.lang, self.country = name.split('-')
             self.catalogs = {'__prototype__': Message(locale=self)}
             for catalog_name, catalog in catalogs.iteritems():
@@ -71,6 +73,13 @@ class Locale(object):
 
     @keep_context()
     def get_helper(self, name):
+        if '.' in name:
+            path = name.split('.')
+            name = path[0]
+            helper = self.helpers.get(name) or self.server.helpers[name]
+            for name in path[1:]:
+                helper = getattr(helper, name)
+            return helper
         return self.helpers.get(name) or self.server.helpers[name]
 
 

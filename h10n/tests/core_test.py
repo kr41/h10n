@@ -166,6 +166,24 @@ def setup():
                                 'msg': 'Locale is {result}'
                             }
                         }
+                    },
+                    'generic_helpers': {
+                        'strategy': 'on_demand',
+                        'source': {
+                            'test': {
+                                'msg': 'Test',
+                            },
+                            'message': {
+                                'filters': [
+                                    (
+                                        'generic.message',
+                                        'generic_helpers.test',
+                                        '{result}'
+                                    ),
+                                ],
+                                'msg': '{result}'
+                            }
+                        }
                     }
                 },
                 'helpers': {
@@ -251,3 +269,8 @@ def compilation_test():
     result = server['en-US.compilation_test.attribute'] \
         .format(locale=server['en-US'])
     tools.eq_(result, "Locale is 'en-US'")
+
+def generic_helpers_test():
+    """ Generic Helpers Test """
+    result = server['en-US.generic_helpers.message'].format()
+    tools.eq_(result, 'Test')
