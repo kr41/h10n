@@ -1,67 +1,67 @@
 # -*- coding: utf-8 -*-
-
-""" The tests for Translator """
-
 from nose import tools
 
-from h10n.manager import LocaleManager
-from h10n.tests import data
+from h10n.translator import Translator
 
 
 def setup():
-    global message, _
+    Translator.get_instance('test').configure(
+        server = {
+            'locales': {
+                'en-US': {
+                    'catalogs': {
+                        'test': {
+                            'strategy': 'on_start_up',
+                            'source': [
+                                {
+                                    'id': 'message',
+                                    'msg': 'Message',
+                                },
+                                {
+                                    'id': 'fallback',
+                                    'msg': 'Fallback Message',
+                                },
+                            ]
+                        }
+                    }
+                },
+                'ru-RU': {
+                    'catalogs': {
+                        'test': {
+                            'strategy': 'on_start_up',
+                            'source': [
+                                {
+                                    'id': 'message',
+                                    'msg': u'Сообщение',
+                                },
+                            ]
+                        }
+                    }
+                },
+            }
+        },
+        fallback = {'ru-RU': 'en-US'},
+        default = 'en-US',
+    )
 
-    # Create and configure Locale Manager
-    lm = LocaleManager.get_instance('test')
-    lm.configure(locales=('en', 'ru'))
-    lm.h.bind_helper('test', data.TestHelper())
-    lm.translator.load(data.simple_source)
-    lm.translator.load(data.complex_source)
 
-    # Create aliases
-    # Translation function (mimics to gettext)
-    _ = lm.translator
-    # Lazy Translatable Message Factory (mimics to regular class)
-    Message = lm.translator.message
+def translator_test():
+    """ Translator test """
+    translator = Translator.get_instance('test')
+    _ = translator.translate
 
-    # Create lazy translatable message
-    message = Message('day.friday')
+    # Test default locale
+    tools.eq_(_('test.message'), 'Message')
 
+    # Test current locale
+    translator.locale = 'ru-RU'
+    tools.eq_(_('test.message'), u'Сообщение')
 
-def simple_translation_test():
-    """ Simple translations """
-    lm = LocaleManager.get_instance('test')
-    lm.locale = 'en'
-    tools.eq_(_('day.monday'), u'Monday')
-    lm.locale = 'ru'
-    tools.eq_(_('day.monday'), u'Понедельник')
+    # Test fallback
+    tools.eq_(_('test.fallback'), 'Fallback Message')
+    tools.eq_(_('test.invalid', fallback='Invalid Message'), 'Invalid Message')
+    tools.eq_(_('test.invalid'), 'Translation Error: ru-RU.test.invalid')
 
-def message_test():
-    """ Lazy translations """
-    lm = LocaleManager.get_instance('test')
-    lm.locale = 'en'
-    tools.eq_(unicode(message), u'Friday')
-    lm.locale = 'ru'
-    tools.eq_(unicode(message), u'Пятница')
-
-def message_str_encoding_test():
-    """ Translation encoding """
-    lm = LocaleManager.get_instance('test')
-    lm.locale = 'ru'
-    tools.eq_(str(message), u'Пятница'.encode('utf-8'))
-
-def complex_translation_test():
-    """ Complex translations """
-    lm = LocaleManager.get_instance('test')
-    lm.locale = 'en'
-    tools.eq_(_('confirm.delete', count=1, object='file'),
-              u'Are you sure you want to delete 1 file?')
-    tools.eq_(_('confirm.delete', count=2, object='file'),
-              u'Are you sure you want to delete 2 files?')
-    lm.locale = 'ru'
-    tools.eq_(_('confirm.delete', count=1, object='file'),
-              u'Вы уверены, что хотите удалить 1 файл?')
-    tools.eq_(_('confirm.delete', count=2, object='file'),
-              u'Вы уверены, что хотите удалить 2 файла?')
-    tools.eq_(_('confirm.delete', count=5, object='file'),
-              u'Вы уверены, что хотите удалить 5 файлов?')
+    # Lazy translatable message test
+    message = translator.message('test.message')
+    tools.eq_(unicode(message), u'Сообщение')

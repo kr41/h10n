@@ -1,162 +1,97 @@
 import logging
 
+from h10n.core import Server
+
 
 logger = logging.getLogger(__name__)
 
 class Translator(object):
-    """ Message Translator
 
-    Provides functional for translation messages according to current locale.
+    _instances = {}
 
-    Translator is instantiated by Locale Manager and available
-    under its attribute ``translator``.
-    """
+    @classmethod
+    def get_instance(cls, name='__default__'):
+        if name not in cls._instances:
+            cls._instances[name] = cls(name)
+        return cls._instances[name]
 
-    def __init__(self, locale_manager):
-        self.lm = locale_manager
-        self.dicts = {}
+    encoding = 'utf-8'
 
-    def load(self, source):
-        """ Load translations to dictionaries
+    def __init__(self, name):
+        self.name = name
 
-        Arguments:
-            source
-                Translation source.  See ``h10n.source`` for details.
-        """
-        for locale in self.lm.locales:
-            translations = self.dicts.setdefault(locale, {})
-            namespace = None
-            source_name = None
-            for data in source[locale]:
-                # Reset namespace on new source.name
-                if source_name != source.name:
-                    source_name = source.name
-                    namespace = None
-                # Setup namespace
-                if 'namespace' in data:
-                    namespace = data['namespace']
-                # Create translation
-                else:
-                    try:
-                        id = data['id']
-                        if namespace is not None:
-                            id = '{0}.{1}'.format(namespace, id)
-                        translation = Translation(data, translations, self.lm.h)
-                        translation.source_name = source_name
-                        translations[id] = translation
-                    except:
-                        logger.error("Invalid translation %r "
-                                     "in namespace '%s' "
-                                     "from source '%s'",
-                                     data, namespace, source_name,
-                                     exc_info=True)
+    def configure(self, server, default, fallback=None, strategy=None):
+        self.default = default
+        self.fallback = fallback or {}
+        self.strategy = strategy or 'simple'
+        if self.strategy == 'simple':
+            self.storage = _simple_storage
+        elif self.strategy == 'thread_local':
+            self.storage = _thread_local_storage
+        else:
+            raise ValueError('Invalid strategy "{0}"'.format(self.strategy))
+        self.server = Server(name=self.name, **server)
 
-    def __call__(self, id, locale_=None, **kwargs):
-        """ Translate message
+    @property
+    def locale(self):
+        return self.storage.__dict__.get('locale', self.default)
 
-        Arguments:
-            id
-                Translation id
-            locale_
-                If specified, override current locale from Locale Manager.
-            **kwargs
-                Keyword arguments to format translated message.
-        """
-        locale = locale_ or self.lm.locale
-        try:
-            translations = self.dicts[locale]
+    @locale.setter
+    def locale(self, locale):
+        if locale not in self.server.locales:
+            raise ValueError('Unsupported locale "{0}"'.format(locale))
+        self.storage.locale = locale
+
+    def translate(self, id, fallback=None, **params):
+        failed_locales = []
+        locale = self.locale
+        logger.debug('Translate %s.%s', locale, id)
+        if fallback is None:
+            logger.warning('Empty fallback message on translate %s', id)
+        while True:
             try:
-                return translations[id].format(**kwargs)
-            except KeyError:
-                logger.error("Translation '%s:%s' is not exist",
+                return self.server[locale][id].format(**params)
+            except Exception:
+                logger.error('Translation error %s.%s',
                              locale, id, exc_info=True)
-            except:
-                logger.error("Error in translation '%s:%s' from source '%s'",
-                             locale, id, translations[id].source_name,
-                             exc_info=True)
-        except KeyError:
-            logger.error("Translations is not loaded for locale '%s'",
-                         locale, exc_info=True)
-        return 'TranslationError:{0}:{1}'.format(locale, id)
+                failed_locales.append(locale)
+                fallback_locale = self.fallback.get(locale)
+                if not fallback_locale or fallback_locale in failed_locales:
+                    break
+                locale = fallback_locale
+                logger.debug('Fallback to %s', locale)
+        if fallback is None:
+            fallback = 'Translation Error: {0}.{1}'.format(self.locale, id)
+        return fallback
 
-    def message(self, id, **kwargs):
-        """ Create lazy translatable message
-
-        Arguments same as for ``__call__`` method.
-        Returns instance of ``h10n.translator.Message``.
-        """
-        return Message(self, id, **kwargs)
+    def message(self, id, fallback=None, **params):
+        return Message(self, id, fallback, **params)
 
 
 class Message(object):
-    """ Lazy translatable message
 
-    Performs translation on convertion to ``unicode`` or ``str``.
-    """
-
-    def __init__(self, translator, id, **kwargs):
+    def __init__(self, translator, id, fallback, **params):
+        if isinstance(translator, basestring):
+            translator = Translation.get_instance(translator)
         self.translator = translator
         self.id = id
-        self.kwargs = kwargs
-
-    def __unicode__(self):
-        return self.translator(self.id, **self.kwargs)
-
-    def __str__(self):
-        return unicode(self).encode(self.translator.lm.encoding)
-
-    def __call__(self, **kwargs):
-        params = self.kwargs.copy()
-        params.update(kwargs)
-        return self.translator(self.id, **params)
+        self.fallback = fallback
+        self.params = params
+        if fallback is None:
+            logger.warning('Empty fallback message in %r', self)
 
     def __repr__(self):
-        return "Message('{0}')".format(self.id)
+        return '<Message: {0}>'.format(self.id)
+
+    def __unicode__(self):
+        return self.translator.translate(self.id, self.fallback, **self.params)
+
+    def __str__(self):
+        return unicode(self).encode(self.translator.encoding)
 
 
-from h10n._compiler import compile_chain as _compile
+from threading import local as _thread_local_storage
 
-class Translation(object):
-    """ Translation record """
-
-    def __init__(self, data, translations, helpers):
-        # Init attributes
-        self.msg = None
-        self.key = None
-        self.defaults = {}
-        self.filters = ()
-        # Update attributes from prototype
-        prototype = data.get('prototype')
-        if prototype is not None:
-            prototype = translations[prototype]
-            self.key = prototype.key
-            self.msg = prototype.msg
-            self.defaults.update(prototype.defaults)
-            self.filters = prototype.filters
-        # Update attributes from own values
-        self.key = data.get('key', self.key)
-        self.msg = data.get('msg', self.key)
-        self.defaults.update(data.get('defaults', {}))
-        # Setup filters
-        filters = data.get('filters', ())
-        if filters and filters[0] == '__no_prototype__':
-            # Prototype filters explicit disabled
-            self.filters = tuple(_compile(helpers, filters[1:]))
-        elif filters and filters[-1] == '__prototype__':
-            # Prototype filters explicit goes last
-            self.filters = tuple(_compile(helpers, filters[:-1])) \
-                         + self.filters
-        else:
-            # Prototype filters implicit goes first
-            self.filters += tuple(_compile(helpers, filters))
-
-    def format(self, **kw):
-        params = self.defaults.copy()
-        params.update(kw)
-        for filter in self.filters:
-            filter(params)
-        msg = self.msg
-        if self.key is not None:
-            key = self.key.format(**params)
-            msg = msg[key]
-        return msg.format(**params)
+class _simple_storage(object):
+    """ An utility class to store values """
+    pass
