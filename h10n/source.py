@@ -1,68 +1,52 @@
-import os
-import inspect
-
 import json
+import yaml
 try:
-    # Include YAML support if it available
-    import yaml
+    from yaml import CLoader as YAMLLoader
 except ImportError:
-    yaml = None
+    from yaml import YAMLLoader
+import dbm
 
 
-class DictSource(object):
+#
+# On-start-up Sources
+###############################################################################
 
-    def __init__(self, data):
-        frame = inspect.stack()[1]
-        module = inspect.getmodule(frame[0]).__name__
-        line = frame[2]
-        self.name = '{0}:{1}'.format(module, line)
-        self.data = data
+class OnStartUpSource(object):
 
-    def __getitem__(self, locale):
-        return self.data[locale]
+    strategy = 'on_start_up'
+
+    def __iter__(self):
+        for item in self.data:
+            yield item
 
 
-class FileSource(object):
+class JSONSource(OnStartUpSource):
 
-    parsers = {'.json': json.loads}
-    if yaml:
-        parsers['.yaml'] = parsers['.yml'] = yaml.load
-
-    def __init__(self, *dirs):
-        self.dirs = dirs
-        self.name = None
-
-    def __getitem__(self, locale):
-        return self._load_translations(locale)
-
-    def _load_translations(self, locale):
-        for dir in self.dirs:
-            locale_path = os.path.join(dir, locale)
-            if os.path.isdir(locale_path):
-                for path, subdirs, files in os.walk(locale_path):
-                    # Load translations from files
-                    for name in files:
-                        ext = os.path.splitext(name)[1]
-                        if ext not in self.parsers:
-                            continue
-                        file_path = os.path.join(path, name)
-                        parser = self.parsers[ext]
-                        for item in self._load_file(file_path, parser):
-                            yield item
-                    # Skip hidden directories
-                    for name in subdirs:
-                        if name.startswith('.'):
-                            subdirs.remove(name)
-            else:
-                for ext, parser in self.parsers.iteritems():
-                    file_path = locale_path + ext
-                    if os.path.isfile(file_path):
-                        for item in self._load_file(file_path, parser):
-                            yield item
-
-    def _load_file(self, path, parser):
+    def __init__(self, path):
         with open(path) as f:
-            self.name = f
-            data = parser(f.read())
-            for item in data:
-                yield item
+            data = json.load(f, loader=YAMLLoader)
+
+
+class YAMLSource(OnStartUpSource):
+
+    def __init__(self, path):
+        with open(path) as f:
+            data = yaml.load()
+
+
+#
+# On-demand Sources
+###############################################################################
+
+class OnDemandSource(object):
+
+    strategy = 'on_demand'
+
+
+class DBMSource(OnDemandSource):
+
+    def __init__(self, path):
+        data = dbm.open(path)
+
+    def __getitem__(self, id):
+        return json.loads(self.data[id])
