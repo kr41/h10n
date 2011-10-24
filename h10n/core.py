@@ -9,16 +9,15 @@ from h10n.helpers import GenericHelpers
 class Server(object):
     """ Localization Server """
 
-    def __init__(self, locales, helpers=None, name='__default__'):
+    def __init__(self, name, config):
         self.name = name
         try:
             self.helpers = {'generic': GenericHelpers()}
-            self.helpers.update(helpers or {})
+            self.helpers.update(config.get('helpers', {}))
             self.locales = {}
-            for name, locale in locales.iteritems():
+            for name, locale in config['locales'].iteritems():
                 try:
-                    self.locales[name] = Locale(name=name, server=self,
-                                                **locale)
+                    self.locales[name] = Locale(name, self, locale)
                 except Exception, e:
                     Context.extend(e, NamedContext('Locale', name))
         except Exception, e:
@@ -38,14 +37,14 @@ class Server(object):
 class Locale(object):
     """ Locale """
 
-    def __init__(self, name, server, catalogs, helpers=None):
+    def __init__(self, name, server, config):
         self.name = name
         try:
             self.server = server
-            self.helpers = helpers or {}
+            self.helpers = config.get('helpers', {})
             self.lang, self.country = name.split('-')
             self.catalogs = {'__prototype__': Message(locale=self)}
-            for catalog_name, catalog in catalogs.iteritems():
+            for catalog_name, catalog in config['catalogs'].iteritems():
                 try:
                     if catalog_name in self.catalogs:
                         raise ValueError(
@@ -53,9 +52,8 @@ class Locale(object):
                                 catalog_name, repr(catalog)
                             )
                         )
-                    self.catalogs[catalog_name] = Catalog(name=catalog_name,
-                                                          locale=self,
-                                                          **catalog)
+                    self.catalogs[catalog_name] = Catalog(catalog_name, self,
+                                                          catalog)
                 except Exception, e:
                     Context.extend(e, NamedContext('Catalog', catalog_name))
         except Exception, e:
@@ -86,10 +84,12 @@ class Locale(object):
 class Catalog(object):
     """ Message Catalog """
 
-    def __init__(self, name, locale, source, strategy=None):
+    def __init__(self, name, locale, config):
         self.name = name
         try:
             self.locale = locale
+            source = config['source']
+            strategy = config.get('strategy')
             # Detect strategy if no provided one
             if strategy is None:
                 if hasattr(source, 'strategy'):

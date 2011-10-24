@@ -28,174 +28,177 @@ def setup():
 
     # Define Localization Server
     server = Server(
-        locales={
-            'en-US': {
-                'catalogs': {
-                    'on_start_up':{
-                        'strategy': 'on_start_up',
-                        'source': [
-                            {
-                                'id': 'simple_test',
-                                'msg': 'Simple Message',
-                            },
-                            {
-                                'id': 'params_test',
-                                'defaults': {'a': 1, 'b': 2},
-                                'msg': 'Parametrized Message with params: '
-                                       'a={a} b={b} c={c}'
-                            },
-                            {
-                                'id': 'key_and_filters_test',
-                                'defaults': {'count': 1},
-                                'filters': [
-                                    ('pluralize', '{count}', '{plural_form}'),
-                                ],
-                                'key': '{plural_form}',
-                                'msg': {
-                                    '0': '{count} message',
-                                    '1': '{count} messages',
+        'test',
+        {
+            'locales': {
+                'en-US': {
+                    'catalogs': {
+                        'on_start_up':{
+                            'strategy': 'on_start_up',
+                            'source': [
+                                {
+                                    'id': 'simple_test',
+                                    'msg': 'Simple Message',
+                                },
+                                {
+                                    'id': 'params_test',
+                                    'defaults': {'a': 1, 'b': 2},
+                                    'msg': 'Parametrized Message with params: '
+                                           'a={a} b={b} c={c}'
+                                },
+                                {
+                                    'id': 'key_and_filters_test',
+                                    'defaults': {'count': 1},
+                                    'filters': [
+                                        ('pluralize', '{count}', '{plural_form}'),
+                                    ],
+                                    'key': '{plural_form}',
+                                    'msg': {
+                                        '0': '{count} message',
+                                        '1': '{count} messages',
+                                    }
+                                },
+                                {
+                                    'id': 'extension_test',
+                                    'filters': [
+                                        ('add', ['{a}', '{b}'], '{a}'),
+                                    ],
+                                    'msg': '{a}'
                                 }
-                            },
-                            {
-                                'id': 'extension_test',
-                                'filters': [
-                                    ('add', ['{a}', '{b}'], '{a}'),
-                                ],
-                                'msg': '{a}'
+                            ]
+                        },
+                        'on_demand': {
+                            'strategy': 'on_demand',
+                            'source': {
+                                'implicit_extension_test': {
+                                    'prototype': 'on_start_up.extension_test',
+                                    'filters': [
+                                        ('mul', ['{a}', '{b}'], '{a}'),
+                                    ],
+                                    'msg': '{a}'
+                                },
+                                'explicit_extension_test': {
+                                    'prototype': 'on_start_up.extension_test',
+                                    'filters': [
+                                        ('mul', ['{a}', '{b}'], '{a}'),
+                                        '__prototype__',
+                                    ],
+                                    'msg': '{a}'
+                                },
+                                'override_test': {
+                                    'prototype': 'on_start_up.extension_test',
+                                    'filters': [
+                                        '__no_prototype__',
+                                        ('mul', ['{a}', '{b}'], '{a}'),
+                                    ],
+                                    'msg': '{a}'
+                                },
                             }
-                        ]
-                    },
-                    'on_demand': {
-                        'strategy': 'on_demand',
-                        'source': {
-                            'implicit_extension_test': {
-                                'prototype': 'on_start_up.extension_test',
-                                'filters': [
-                                    ('mul', ['{a}', '{b}'], '{a}'),
-                                ],
-                                'msg': '{a}'
-                            },
-                            'explicit_extension_test': {
-                                'prototype': 'on_start_up.extension_test',
-                                'filters': [
-                                    ('mul', ['{a}', '{b}'], '{a}'),
-                                    '__prototype__',
-                                ],
-                                'msg': '{a}'
-                            },
-                            'override_test': {
-                                'prototype': 'on_start_up.extension_test',
-                                'filters': [
-                                    '__no_prototype__',
-                                    ('mul', ['{a}', '{b}'], '{a}'),
-                                ],
-                                'msg': '{a}'
-                            },
-                        }
-                    },
-                    'compilation_test': {
-                        'strategy': 'on_demand',
-                        'source': {
-                            'multiple_result': {
-                                'filters': [
-                                    ('swap_args', ['{a}', '{b}'],
-                                                  ['{a}', '{b}']),
-                                ],
-                                'msg': '{a} {b}'
-                            },
-                            'positional_args': {
-                                'filters': [
-                                    ('print_args', ['{a}', '{b}'], '{result}'),
-                                ],
-                                'msg': '{result}'
-                            },
-                            'single_arg': {
-                                'filters': [
-                                    ('print_args', '{a}', '{result}'),
-                                ],
-                                'msg': '{result}'
-                            },
-                            'no_arg': {
-                                'filters': [
-                                    ('print_args', [], '{result}'),
-                                ],
-                                'msg': '{result}'
-                            },
-                            'keyword_args': {
-                                'filters': [
-                                    ('print_args', {'a': '{a}', 'b': '{b}'},
-                                                    '{result}'),
-                                ],
-                                'msg': '{result}'
-                            },
-                            'mixed_args': {
-                                'filters': [
-                                    (
-                                        'print_args',
-                                        {'*': [1, 2], 'a': '{a}', 'b': '{b}'},
-                                        '{result}'
-                                    ),
-                                ],
-                                'msg': '{result}'
-                            },
-                            'mixed_args_2': {
-                                'filters': [
-                                    (
-                                        'print_args',
-                                        {'*': 1, 'a': '{a}', 'b': '{b}'},
-                                        '{result}'
-                                    ),
-                                ],
-                                'msg': '{result}'
-                            },
-                            'primitives': {
-                                'id': 'test',
-                                'filters': [
-                                    (
-                                        'print_args',
-                                        [None, False, True, 'string'],
-                                        '{result}'
-                                    ),
-                                ],
-                                'msg': '{result}'
-                            },
-                            'attribute': {
-                                'filters': [
-                                    ('print_args', '{locale}.name', '{result}'),
-                                ],
-                                'msg': 'Locale is {result}'
+                        },
+                        'compilation_test': {
+                            'strategy': 'on_demand',
+                            'source': {
+                                'multiple_result': {
+                                    'filters': [
+                                        ('swap_args', ['{a}', '{b}'],
+                                                      ['{a}', '{b}']),
+                                    ],
+                                    'msg': '{a} {b}'
+                                },
+                                'positional_args': {
+                                    'filters': [
+                                        ('print_args', ['{a}', '{b}'], '{result}'),
+                                    ],
+                                    'msg': '{result}'
+                                },
+                                'single_arg': {
+                                    'filters': [
+                                        ('print_args', '{a}', '{result}'),
+                                    ],
+                                    'msg': '{result}'
+                                },
+                                'no_arg': {
+                                    'filters': [
+                                        ('print_args', [], '{result}'),
+                                    ],
+                                    'msg': '{result}'
+                                },
+                                'keyword_args': {
+                                    'filters': [
+                                        ('print_args', {'a': '{a}', 'b': '{b}'},
+                                                        '{result}'),
+                                    ],
+                                    'msg': '{result}'
+                                },
+                                'mixed_args': {
+                                    'filters': [
+                                        (
+                                            'print_args',
+                                            {'*': [1, 2], 'a': '{a}', 'b': '{b}'},
+                                            '{result}'
+                                        ),
+                                    ],
+                                    'msg': '{result}'
+                                },
+                                'mixed_args_2': {
+                                    'filters': [
+                                        (
+                                            'print_args',
+                                            {'*': 1, 'a': '{a}', 'b': '{b}'},
+                                            '{result}'
+                                        ),
+                                    ],
+                                    'msg': '{result}'
+                                },
+                                'primitives': {
+                                    'id': 'test',
+                                    'filters': [
+                                        (
+                                            'print_args',
+                                            [None, False, True, 'string'],
+                                            '{result}'
+                                        ),
+                                    ],
+                                    'msg': '{result}'
+                                },
+                                'attribute': {
+                                    'filters': [
+                                        ('print_args', '{locale}.name', '{result}'),
+                                    ],
+                                    'msg': 'Locale is {result}'
+                                }
                             }
-                        }
-                    },
-                    'generic_helpers': {
-                        'strategy': 'on_demand',
-                        'source': {
-                            'test': {
-                                'msg': 'Test',
-                            },
-                            'message': {
-                                'filters': [
-                                    (
-                                        'generic.message',
-                                        'generic_helpers.test',
-                                        '{result}'
-                                    ),
-                                ],
-                                'msg': '{result}'
+                        },
+                        'generic_helpers': {
+                            'strategy': 'on_demand',
+                            'source': {
+                                'test': {
+                                    'msg': 'Test',
+                                },
+                                'message': {
+                                    'filters': [
+                                        (
+                                            'generic.message',
+                                            'generic_helpers.test',
+                                            '{result}'
+                                        ),
+                                    ],
+                                    'msg': '{result}'
+                                }
                             }
                         }
-                    }
-                },
-                'helpers': {
-                    'pluralize': pluralize,
-                },
+                    },
+                    'helpers': {
+                        'pluralize': pluralize,
+                    },
+                }
+            },
+            'helpers': {
+                'add': add,
+                'mul': mul,
+                'swap_args': swap_args,
+                'print_args': print_args,
             }
-        },
-        helpers={
-            'add': add,
-            'mul': mul,
-            'swap_args': swap_args,
-            'print_args': print_args,
         }
     )
 

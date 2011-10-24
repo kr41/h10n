@@ -6,42 +6,44 @@ from h10n.translator import Translator
 
 def setup():
     Translator.get_instance('test').configure(
-        server = {
-            'locales': {
-                'en-US': {
-                    'catalogs': {
-                        'test': {
-                            'strategy': 'on_start_up',
-                            'source': [
-                                {
-                                    'id': 'message',
-                                    'msg': 'Message',
-                                },
-                                {
-                                    'id': 'fallback',
-                                    'msg': 'Fallback Message',
-                                },
-                            ]
+        {
+            'server': {
+                'locales': {
+                    'en-US': {
+                        'catalogs': {
+                            'test': {
+                                'strategy': 'on_start_up',
+                                'source': [
+                                    {
+                                        'id': 'message',
+                                        'msg': 'Message',
+                                    },
+                                    {
+                                        'id': 'fallback',
+                                        'msg': 'Fallback Message',
+                                    },
+                                ]
+                            }
                         }
-                    }
-                },
-                'ru-RU': {
-                    'catalogs': {
-                        'test': {
-                            'strategy': 'on_start_up',
-                            'source': [
-                                {
-                                    'id': 'message',
-                                    'msg': u'Сообщение',
-                                },
-                            ]
+                    },
+                    'ru-RU': {
+                        'catalogs': {
+                            'test': {
+                                'strategy': 'on_start_up',
+                                'source': [
+                                    {
+                                        'id': 'message',
+                                        'msg': u'Сообщение',
+                                    },
+                                ]
+                            }
                         }
-                    }
-                },
-            }
-        },
-        fallback = {'ru-RU': 'en-US'},
-        default = 'en-US',
+                    },
+                }
+            },
+            'fallback': {'ru-RU': 'en-US'},
+            'default': 'en-US',
+        }
     )
 
 

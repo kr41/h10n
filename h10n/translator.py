@@ -20,18 +20,17 @@ class Translator(object):
     def __init__(self, name):
         self.name = name
 
-    def configure(self, server, default, fallback=None, strategy=None):
-        self.default = default
-        self.fallback = fallback or {}
-        self.strategy = strategy or 'simple'
+    def configure(self, config):
+        self.default = config['default']
+        self.fallback = config.get('fallback', {})
+        self.strategy = config.get('strategy', 'simple')
         if self.strategy == 'simple':
             self.storage = _simple_storage
         elif self.strategy == 'thread_local':
             self.storage = _thread_local_storage
         else:
             raise ValueError('Invalid strategy "{0}"'.format(self.strategy))
-        self.server = Server(name=self.name, **server)
-
+        self.server = Server(self.name, config['server'])
     @property
     def locale(self):
         return self.storage.__dict__.get('locale', self.default)
