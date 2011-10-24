@@ -9,19 +9,16 @@ from h10n.helpers import GenericHelpers
 class Server(object):
     """ Localization Server """
 
+    name = '__empty__'
+
+    @keep_context()
     def __init__(self, name, config):
         self.name = name
-        try:
-            self.helpers = {'generic': GenericHelpers()}
-            self.helpers.update(config.get('helpers', {}))
-            self.locales = {}
-            for name, locale in config['locales'].iteritems():
-                try:
-                    self.locales[name] = Locale(name, self, locale)
-                except Exception, e:
-                    Context.extend(e, NamedContext('Locale', name))
-        except Exception, e:
-            Context.extend(e, self)
+        self.helpers = {'generic': GenericHelpers()}
+        self.helpers.update(config.get('helpers', {}))
+        self.locales = {}
+        for name, locale in config['locales'].iteritems():
+            self.locales[name] = Locale(name, self, locale)
 
     def __repr__(self):
         return '<Server: {0}>'.format(self.name)
@@ -37,27 +34,20 @@ class Server(object):
 class Locale(object):
     """ Locale """
 
+    name = '__empty__'
+
+    @keep_context()
     def __init__(self, name, server, config):
         self.name = name
-        try:
-            self.server = server
-            self.helpers = config.get('helpers', {})
-            self.lang, self.country = name.split('-')
-            self.catalogs = {'__prototype__': Message(locale=self)}
-            for catalog_name, catalog in config['catalogs'].iteritems():
-                try:
-                    if catalog_name in self.catalogs:
-                        raise ValueError(
-                            'Duplicate catalog name "{0}": {1}'.format(
-                                catalog_name, repr(catalog)
-                            )
-                        )
-                    self.catalogs[catalog_name] = Catalog(catalog_name, self,
-                                                          catalog)
-                except Exception, e:
-                    Context.extend(e, NamedContext('Catalog', catalog_name))
-        except Exception, e:
-            Context.extend(e, self)
+        self.server = server
+        self.helpers = config.get('helpers', {})
+        self.lang, self.country = name.split('-')
+        self.catalogs = {'__prototype__': Message(locale=self)}
+        for catalog_name, catalog in config['catalogs'].iteritems():
+            if catalog_name in self.catalogs:
+                raise ValueError('Duplicate catalog name "{0}": {1}'.
+                                 format(catalog_name, repr(catalog)))
+            self.catalogs[catalog_name] = Catalog(catalog_name, self, catalog)
 
     def __repr__(self):
         return '<Locale: {0}>'.format(self.name)
@@ -84,41 +74,32 @@ class Locale(object):
 class Catalog(object):
     """ Message Catalog """
 
+    name = '__empty__'
+
+    @keep_context()
     def __init__(self, name, locale, config):
         self.name = name
-        try:
-            self.locale = locale
-            source = config['source']
-            strategy = config.get('strategy')
-            # Detect strategy if no provided one
-            if strategy is None:
-                if hasattr(source, 'strategy'):
-                    strategy = source.strategy
-            # Compile messages on demand...
-            if strategy == 'on_demand':
-                self.source = source
-            # ...or on start-up and store compiled ones in memory
-            elif strategy == 'on_start_up':
-                self.source = {}
-                for message in source:
-                    id = message['id']
-                    try:
-                        if id in self.source:
-                            raise ValueError(
-                                'Duplicate message id "{0}": {1}'.format(
-                                    id, message
-                                )
-                            )
-                        self.source[id] = self._compile_message(**message)
-                    except Exception, e:
-                        Context.extend(
-                            e,
-                            NamedContext(e, NamedContext('Message', id))
-                        )
-            else:
-                raise ValueError('Invalid strategy "{0}"'.format(strategy))
-        except Exception, e:
-            Context.extend(e, self)
+        self.locale = locale
+        source = config['source']
+        strategy = config.get('strategy')
+        # Detect strategy if no provided one
+        if strategy is None:
+            if hasattr(source, 'strategy'):
+                strategy = source.strategy
+        # Compile messages on demand...
+        if strategy == 'on_demand':
+            self.source = source
+        # ...or on start-up and store compiled ones in memory
+        elif strategy == 'on_start_up':
+            self.source = {}
+            for message in source:
+                id = message['id']
+                if id in self.source:
+                    raise ValueError('Duplicate message id "{0}": {1}'.
+                                     format(id, message))
+                self.source[id] = self._compile_message(**message)
+        else:
+            raise ValueError('Invalid strategy "{0}"'.format(strategy))
 
     def __repr__(self):
         return '<Catalog: {0}>'.format(self.name)
