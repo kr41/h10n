@@ -97,6 +97,8 @@ class Catalog(object):
     def __getitem__(self, id):
         result = self.messages[id]
         if not isinstance(result, Message):
+            if isinstance(result, basestring):
+                result = {'msg': result}
             result = self.messages[id] = self._compile_message(id=id, **result)
         return result
 

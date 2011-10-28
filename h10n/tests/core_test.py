@@ -35,9 +35,7 @@ def setup():
                     'catalogs': {
                         'on_start_up':{
                             'messages': {
-                                'simple_test': {
-                                    'msg': 'Simple Message',
-                                },
+                                'simple_test': 'Simple Message',
                                 'params_test': {
                                     'defaults': {'a': 1, 'b': 2},
                                     'msg': 'Parametrized Message with params: '
@@ -163,9 +161,7 @@ def setup():
                         },
                         'generic_helpers': {
                             'messages': {
-                                'test': {
-                                    'msg': 'Test',
-                                },
+                                'test': 'Test',
                                 'message': {
                                     'filters': [
                                         (

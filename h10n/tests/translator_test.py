@@ -13,12 +13,8 @@ def setup():
                         'catalogs': {
                             'test': {
                                 'messages': {
-                                    'message': {
-                                        'msg': 'Message',
-                                    },
-                                    'fallback': {
-                                        'msg': 'Fallback Message',
-                                    },
+                                    'message': 'Message',
+                                    'fallback': 'Fallback Message',
                                 }
                             }
                         }
@@ -27,9 +23,7 @@ def setup():
                         'catalogs': {
                             'test': {
                                 'messages': {
-                                    'message': {
-                                        'msg': u'Сообщение',
-                                    },
+                                    'message':  u'Сообщение',
                                 }
                             }
                         }
