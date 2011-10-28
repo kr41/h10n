@@ -34,20 +34,16 @@ def setup():
                 'en-US': {
                     'catalogs': {
                         'on_start_up':{
-                            'strategy': 'on_start_up',
-                            'source': [
-                                {
-                                    'id': 'simple_test',
+                            'messages': {
+                                'simple_test': {
                                     'msg': 'Simple Message',
                                 },
-                                {
-                                    'id': 'params_test',
+                                'params_test': {
                                     'defaults': {'a': 1, 'b': 2},
                                     'msg': 'Parametrized Message with params: '
                                            'a={a} b={b} c={c}'
                                 },
-                                {
-                                    'id': 'key_and_filters_test',
+                                'key_and_filters_test': {
                                     'defaults': {'count': 1},
                                     'filters': [
                                         ('pluralize', '{count}', '{plural_form}'),
@@ -58,18 +54,16 @@ def setup():
                                         '1': '{count} messages',
                                     }
                                 },
-                                {
-                                    'id': 'extension_test',
+                                'extension_test': {
                                     'filters': [
                                         ('add', ['{a}', '{b}'], '{a}'),
                                     ],
                                     'msg': '{a}'
                                 }
-                            ]
+                            }
                         },
                         'on_demand': {
-                            'strategy': 'on_demand',
-                            'source': {
+                            'messages': {
                                 'implicit_extension_test': {
                                     'prototype': 'on_start_up.extension_test',
                                     'filters': [
@@ -96,8 +90,7 @@ def setup():
                             }
                         },
                         'compilation_test': {
-                            'strategy': 'on_demand',
-                            'source': {
+                            'messages': {
                                 'multiple_result': {
                                     'filters': [
                                         ('swap_args', ['{a}', '{b}'],
@@ -151,7 +144,6 @@ def setup():
                                     'msg': '{result}'
                                 },
                                 'primitives': {
-                                    'id': 'test',
                                     'filters': [
                                         (
                                             'print_args',
@@ -170,8 +162,7 @@ def setup():
                             }
                         },
                         'generic_helpers': {
-                            'strategy': 'on_demand',
-                            'source': {
+                            'messages': {
                                 'test': {
                                     'msg': 'Test',
                                 },

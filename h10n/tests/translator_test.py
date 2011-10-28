@@ -12,30 +12,25 @@ def setup():
                     'en-US': {
                         'catalogs': {
                             'test': {
-                                'strategy': 'on_start_up',
-                                'source': [
-                                    {
-                                        'id': 'message',
+                                'messages': {
+                                    'message': {
                                         'msg': 'Message',
                                     },
-                                    {
-                                        'id': 'fallback',
+                                    'fallback': {
                                         'msg': 'Fallback Message',
                                     },
-                                ]
+                                }
                             }
                         }
                     },
                     'ru-RU': {
                         'catalogs': {
                             'test': {
-                                'strategy': 'on_start_up',
-                                'source': [
-                                    {
-                                        'id': 'message',
+                                'messages': {
+                                    'message': {
                                         'msg': u'Сообщение',
                                     },
-                                ]
+                                }
                             }
                         }
                     },

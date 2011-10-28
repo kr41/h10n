@@ -6,6 +6,7 @@ from h10n.util import Context
 
 from h10n.helpers import GenericHelpers
 
+
 class Server(object):
     """ Localization Server """
 
@@ -76,41 +77,27 @@ class Catalog(object):
 
     name = '__empty__'
 
+    # TODO: Replace it by thread-safe true cache with invalidation on overflow
+    _cache = {}
+
     @keep_context()
     def __init__(self, name, locale, config):
         self.name = name
         self.locale = locale
-        source = config['source']
-        strategy = config.get('strategy')
-        # Detect strategy if no provided one
-        if strategy is None:
-            if hasattr(source, 'strategy'):
-                strategy = source.strategy
-        # Compile messages on demand...
-        if strategy == 'on_demand':
-            self.source = source
-        # ...or on start-up and store compiled ones in memory
-        elif strategy == 'on_start_up':
-            self.source = {}
-            for message in source:
-                id = message['id']
-                if id in self.source:
-                    raise ValueError('Duplicate message id "{0}": {1}'.
-                                     format(id, message))
-                self.source[id] = self._compile_message(**message)
+        factory = config.pop('factory', None)
+        if factory is None and 'messages' in config:
+            self.messages = config['messages']
         else:
-            raise ValueError('Invalid strategy "{0}"'.format(strategy))
+            self.messages = factory(**config)
 
     def __repr__(self):
         return '<Catalog: {0}>'.format(self.name)
 
     @keep_context()
     def __getitem__(self, id):
-        result = self.source[id]
-        # If result is not compiled message, i.e. strategy == 'on_demand'
+        result = self.messages[id]
         if not isinstance(result, Message):
-            result['id'] = id
-            result = self._compile_message(**result)
+            result = self.messages[id] = self._compile_message(id=id, **result)
         return result
 
     @keep_context()

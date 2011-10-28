@@ -7,8 +7,6 @@ except ImportError:
 
 class YAMLSource(dict):
 
-    strategy = 'on_start_up'
-
     def __init__(self, path):
         with open(path) as f:
             self.update(yaml.load(f, Loader=YAMLLoader))
