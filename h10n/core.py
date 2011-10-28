@@ -2,23 +2,19 @@ import re
 from textwrap import dedent
 
 from h10n.util import keep_context
+from h10n.util import NamedObject
 from h10n import helpers as generic
 
 
-class Server(object):
-    """ Localization Server """
-
-    name = '__empty__'
+class Root(NamedObject):
+    """ Localization Root """
 
     @keep_context
-    def __init__(self, name, config):
+    def __init__(self, name, locales):
         self.name = name
         self.locales = {}
-        for name, locale in config['locales'].iteritems():
+        for name, locale in locales.iteritems():
             self.locales[name] = Locale(name, self, locale)
-
-    def __repr__(self):
-        return '<Server: {0}>'.format(self.name)
 
     @keep_context
     def __getitem__(self, name):
@@ -28,25 +24,20 @@ class Server(object):
         return self.locales[name]
 
 
-class Locale(object):
+class Locale(NamedObject):
     """ Locale """
 
-    name = '__empty__'
-
     @keep_context
-    def __init__(self, name, server, config):
+    def __init__(self, name, root, catalogs):
         self.name = name
-        self.server = server
+        self.root = root
         self.lang, self.country = name.split('-')
         self.catalogs = {'__prototype__': Message()}
-        for catalog_name, catalog in config['catalogs'].iteritems():
+        for catalog_name, catalog in catalogs.iteritems():
             if catalog_name in self.catalogs:
                 raise ValueError('Duplicate catalog name "{0}": {1}'.
                                  format(catalog_name, repr(catalog)))
             self.catalogs[catalog_name] = Catalog(catalog_name, self, catalog)
-
-    def __repr__(self):
-        return '<Locale: {0}>'.format(self.name)
 
     @keep_context
     def __getitem__(self, name):
@@ -56,10 +47,8 @@ class Locale(object):
         return self.catalogs[name]
 
 
-class Catalog(object):
+class Catalog(NamedObject):
     """ Message Catalog """
-
-    name = '__empty__'
 
     @keep_context
     def __init__(self, name, locale, config):
@@ -71,9 +60,6 @@ class Catalog(object):
         else:
             self.messages = factory(**config)
         self.helpers = self._import_helpers()
-
-    def __repr__(self):
-        return '<Catalog: {0}>'.format(self.name)
 
     @keep_context
     def __getitem__(self, id):
@@ -99,10 +85,9 @@ class Catalog(object):
         return result
 
 
-class Message(object):
+class Message(NamedObject):
     """ Localized Message """
 
-    id = '__empty__'
     key = None
     msg = None
     defaults = None
@@ -111,9 +96,9 @@ class Message(object):
     parser = re.compile('\$([a-z_]{1}[a-z_0-9]*)', re.I)
 
     @keep_context
-    def __init__(self, id='__prototype__', catalog=None, prototype=None,
+    def __init__(self, name='__prototype__', catalog=None, prototype=None,
                  key=None, msg=None, defaults=None, filter=None):
-        self.id = id
+        self.name = name
         self.catalog = catalog
         if self.catalog is None:
             return
@@ -137,9 +122,6 @@ class Message(object):
             code = '\n    '.join(code)
             exec code in helpers, locals()
             self.filter = f
-
-    def __repr__(self):
-        return '<Message: {0}>'.format(self.id)
 
     @keep_context
     def format(self, **kw):

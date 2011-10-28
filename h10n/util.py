@@ -1,3 +1,11 @@
+class NamedObject(object):
+
+    name = '__empty__'
+
+    def __repr__(self):
+        return '<{0}: {1}>'.format(self.__class__.__name__, self.name)
+
+
 class ExceptionContext(object):
     """ Exception Context """
 
@@ -20,6 +28,7 @@ class ExceptionContext(object):
         # Create new context and add it to the end of exception's arguments
         exception.args += (cls(obj),)
         raise
+
 
 def keep_context(method):
     """ Includes context into exception raised from decorated method """

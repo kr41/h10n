@@ -7,27 +7,21 @@ from h10n.translator import Translator
 def setup():
     Translator.get_instance('test').configure(
         {
-            'server': {
-                'locales': {
-                    'en-US': {
-                        'catalogs': {
-                            'test': {
-                                'messages': {
-                                    'message': 'Message',
-                                    'fallback': 'Fallback Message',
-                                }
-                            }
+            'root': {
+                'en-US': {
+                    'test': {
+                        'messages': {
+                            'message': 'Message',
+                            'fallback': 'Fallback Message',
                         }
-                    },
-                    'ru-RU': {
-                        'catalogs': {
-                            'test': {
-                                'messages': {
-                                    'message':  u'Сообщение',
-                                }
-                            }
+                    }
+                },
+                'ru-RU': {
+                    'test': {
+                        'messages': {
+                            'message':  u'Сообщение',
                         }
-                    },
+                    }
                 }
             },
             'fallback': {'ru-RU': 'en-US'},
