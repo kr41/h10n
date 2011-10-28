@@ -2,9 +2,6 @@ import re
 from textwrap import dedent
 
 from h10n.util import keep_context
-from h10n.util import NamedContext
-from h10n.util import Context
-
 from h10n import helpers as generic
 
 
@@ -13,7 +10,7 @@ class Server(object):
 
     name = '__empty__'
 
-    @keep_context()
+    @keep_context
     def __init__(self, name, config):
         self.name = name
         self.locales = {}
@@ -23,7 +20,7 @@ class Server(object):
     def __repr__(self):
         return '<Server: {0}>'.format(self.name)
 
-    @keep_context()
+    @keep_context
     def __getitem__(self, name):
         if '.' in name:
             name, tail = name.split('.', 1)
@@ -36,7 +33,7 @@ class Locale(object):
 
     name = '__empty__'
 
-    @keep_context()
+    @keep_context
     def __init__(self, name, server, config):
         self.name = name
         self.server = server
@@ -51,7 +48,7 @@ class Locale(object):
     def __repr__(self):
         return '<Locale: {0}>'.format(self.name)
 
-    @keep_context()
+    @keep_context
     def __getitem__(self, name):
         if '.' in name:
             name, tail = name.split('.', 1)
@@ -64,7 +61,7 @@ class Catalog(object):
 
     name = '__empty__'
 
-    @keep_context()
+    @keep_context
     def __init__(self, name, locale, config):
         self.name = name
         self.locale = locale
@@ -78,7 +75,7 @@ class Catalog(object):
     def __repr__(self):
         return '<Catalog: {0}>'.format(self.name)
 
-    @keep_context()
+    @keep_context
     def __getitem__(self, id):
         result = self.messages[id]
         if not isinstance(result, Message):
@@ -87,7 +84,7 @@ class Catalog(object):
             result = self.messages[id] = Message(id, self, **result)
         return result
 
-    @keep_context()
+    @keep_context
     def _import_helpers(self):
         imports = self.messages.get('__helpers__')
         result = {'generic': generic, '__locale__': self.locale}
@@ -110,10 +107,10 @@ class Message(object):
     msg = None
     defaults = None
     filter = None
-    
+
     parser = re.compile('\$([a-z_]{1}[a-z_0-9]*)', re.I)
 
-    @keep_context()
+    @keep_context
     def __init__(self, id='__prototype__', catalog=None, prototype=None,
                  key=None, msg=None, defaults=None, filter=None):
         self.id = id
@@ -144,7 +141,7 @@ class Message(object):
     def __repr__(self):
         return '<Message: {0}>'.format(self.id)
 
-    @keep_context()
+    @keep_context
     def format(self, **kw):
         """ Format Message according to passed parameters """
         params = self.defaults.copy()
