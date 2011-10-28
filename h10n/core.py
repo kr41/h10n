@@ -1,5 +1,6 @@
 import re
 from textwrap import dedent
+from threading import RLock
 
 from h10n.util import keep_context
 from h10n.util import NamedObject
@@ -60,14 +61,16 @@ class Catalog(NamedObject):
         else:
             self.messages = factory(**config)
         self.helpers = self._import_helpers()
+        self._mutex = RLock()
 
     @keep_context
     def __getitem__(self, id):
         result = self.messages[id]
         if not isinstance(result, Message):
-            if isinstance(result, basestring):
-                result = {'msg': result}
-            result = self.messages[id] = Message(id, self, **result)
+            with self._mutex:
+                if isinstance(result, basestring):
+                    result = {'msg': result}
+                result = self.messages[id] = Message(id, self, **result)
         return result
 
     @keep_context
