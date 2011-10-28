@@ -77,9 +77,6 @@ class Catalog(object):
 
     name = '__empty__'
 
-    # TODO: Replace it by thread-safe true cache with invalidation on overflow
-    _cache = {}
-
     @keep_context()
     def __init__(self, name, locale, config):
         self.name = name
