@@ -7,7 +7,7 @@ from h10n.translator import Translator
 def setup():
     Translator.get_instance('test').configure(
         {
-            'root': {
+            'locales': {
                 'en-US': {
                     'test': {
                         'messages': {

@@ -1,6 +1,6 @@
 import logging
 
-from h10n.core import Root
+from h10n.core import Locale
 
 
 logger = logging.getLogger(__name__)
@@ -30,7 +30,9 @@ class Translator(object):
             self.storage = _thread_local_storage
         else:
             raise ValueError('Invalid strategy "{0}"'.format(self.strategy))
-        self.root = Root(self.name, config['root'])
+        self.locales = {}
+        for name, catalogs in config['locales'].iteritems():
+            self.locales[name] = Locale(name, self, catalogs)
 
     @property
     def locale(self):
@@ -38,7 +40,7 @@ class Translator(object):
 
     @locale.setter
     def locale(self, locale):
-        if locale not in self.root.locales:
+        if locale not in self.locales:
             raise ValueError('Unsupported locale "{0}"'.format(locale))
         self.storage.locale = locale
 
@@ -50,7 +52,7 @@ class Translator(object):
             logger.warning('Empty fallback message on translate %s', id)
         while True:
             try:
-                return self.root[locale][id].format(**params)
+                return self.locales[locale][id].format(**params)
             except Exception:
                 logger.error('Translation error %s.%s',
                              locale, id, exc_info=True)

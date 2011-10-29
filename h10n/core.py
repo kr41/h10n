@@ -7,31 +7,13 @@ from h10n.util import NamedObject
 from h10n import helpers as generic
 
 
-class Root(NamedObject):
-    """ Localization Root """
-
-    @keep_context
-    def __init__(self, name, locales):
-        self.name = name
-        self.locales = {}
-        for name, locale in locales.iteritems():
-            self.locales[name] = Locale(name, self, locale)
-
-    @keep_context
-    def __getitem__(self, name):
-        if '.' in name:
-            name, tail = name.split('.', 1)
-            return self.locales[name][tail]
-        return self.locales[name]
-
-
 class Locale(NamedObject):
     """ Locale """
 
     @keep_context
-    def __init__(self, name, root, catalogs):
+    def __init__(self, name, translator=None, catalogs=None):
         self.name = name
-        self.root = root
+        self.translator = translator
         self.lang, self.country = name.split('-')
         self.catalogs = {'__prototype__': Message()}
         for catalog_name, catalog in catalogs.iteritems():
@@ -76,7 +58,7 @@ class Catalog(NamedObject):
     @keep_context
     def _import_helpers(self):
         imports = self.messages.get('__helpers__')
-        result = {'generic': generic, '__locale__': self.locale}
+        result = {'generic': generic}
         if imports is not None:
             local_keys = key = local_dict = None
             local_keys = locals().keys()
@@ -114,13 +96,14 @@ class Message(NamedObject):
         if filter is not None:
             helpers = self.catalog.helpers
             if '__prototype__' in filter:
-                code = '__prototype__.filter(kw)' if prototype.filter else ''
+                code = '__prototype__.filter(__locale__, kw)' \
+                       if prototype.filter else ''
                 filter = filter.replace('__prototype__', code)
                 helpers = helpers.copy()
                 helpers['__prototype__'] = prototype
             filter = self.parser.sub(r'kw["\g<1>"]', filter)
             filter = dedent(filter)
-            code = ['def f(kw):']
+            code = ['def f(__locale__, kw):']
             code.extend(filter.split('\n'))
             code = '\n    '.join(code)
             exec code in helpers, locals()
@@ -132,7 +115,7 @@ class Message(NamedObject):
         params = self.defaults.copy()
         params.update(kw)
         if self.filter:
-            self.filter(params)
+            self.filter(self.catalog.locale, params)
         msg = self.msg
         if self.key is not None:
             key = self.key.format(**params)
