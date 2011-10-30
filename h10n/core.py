@@ -15,7 +15,7 @@ class Locale(NamedObject):
         self.name = name
         self.translator = translator
         self.lang, self.country = name.split('-')
-        self.catalogs = {'__prototype__': Message()}
+        self.catalogs = {}
         for catalog_name, catalog in catalogs.iteritems():
             if catalog_name in self.catalogs:
                 raise ValueError('Duplicate catalog name "{0}": {1}'.
@@ -41,67 +41,75 @@ class Catalog(NamedObject):
         # Create messages
         factory = config.pop('factory', None)
         if factory is None and 'messages' in config:
-            self.messages = config['messages']
+            self.source = config['messages']
         else:
-            self.messages = factory(**config)
+            self.source = factory(**config)
         # Create helpers namespace
-        self.helpers = {'generic': generic, '__builtins__': __builtins__}
-        imports = self.messages.get('__helpers__')
+        self.helpers = {}
+        imports = self.source.get('__helpers__')
         if imports:
             exec dedent(imports) in locals(), self.helpers
+        # Create prototypes namespace
+        self.prototypes = {}
+        imports = self.source.get('__prototypes__')
+        if imports:
+            exec dedent(imports) in locals(), self.prototypes
+
 
     @keep_context
-    def __getitem__(self, id):
-        result = self.messages[id]
-        if not isinstance(result, Message):
+    def __getitem__(self, name):
+        message = self.source[name]
+        if not isinstance(message, Message):
             with self._mutex:
-                if isinstance(result, basestring):
-                    result = {'msg': result}
-                result = self.messages[id] = Message(id, self, **result)
-        return result
-
-    @keep_context
-    def get_prototype(self, name):
-        return self.locale[name or '__prototype__']
+                if isinstance(message, basestring):
+                    message = {'msg': message}
+                prototype = message.pop('prototype', None)
+                if prototype:
+                    prototype = self.prototypes.get(prototype) or \
+                                self.locale[prototype]
+                message = self.source[name] = Message(name, self.locale,
+                                                      helpers=self.helpers,
+                                                      prototype=prototype,
+                                                      **message)
+        return message
 
 
 class Message(NamedObject):
     """ Localized Message """
 
-    key = None
-    msg = None
-    filter = None
-    defaults = {}
-
     _parser = re.compile('\$([a-z_]{1}[a-z_0-9]*)', re.I)
 
     @keep_context
-    def __init__(self, name='__prototype__', catalog=None, prototype=None,
-                 key=None, msg=None, defaults=None, filter=None):
+    def __init__(self, name='__empty__', locale=None, prototype=None,
+                 key=None, msg=None, defaults=None, filter=None, helpers=None):
         self.name = name
-        self.catalog = catalog
-        if self.catalog is None:
-            return
-        prototype = self.catalog.get_prototype(prototype)
-        self.key = key or prototype.key
-        self.msg = msg or prototype.msg
-        self.defaults = prototype.defaults.copy()
-        if defaults:
-            self.defaults.update(defaults)
+        self.locale = locale
+        self.key = key
+        self.msg = msg
+        self.filter = None
+        self.defaults = {}
+        if prototype:
+            self.key = self.key or prototype.key
+            self.msg = self.msg or prototype.msg
+            self.defaults.update(prototype.defaults)
+        self.defaults.update(defaults or {})
         if filter:
+            namespace = {
+                'generic': generic,
+                '__builtins__': __builtins__,
+                '__prototype__': prototype,
+            }
+            namespace.update(helpers or {})
             filter = dedent(filter)
-            helpers = self.catalog.helpers
             if '__prototype__' in filter:
                 prototype_call = '__prototype__.filter(__locale__, kw)' \
-                                 if prototype.filter else ''
+                                 if prototype and prototype.filter else ''
                 filter = filter.replace('__prototype__', prototype_call)
-                helpers = helpers.copy()
-                helpers['__prototype__'] = prototype
             filter = self._parser.sub(r'kw["\g<1>"]', filter)
-            code = ['def filter(__locale__, kw):']
-            code.extend(filter.split('\n'))
-            code = '\n    '.join(code)
-            exec code in helpers, self.__dict__
+            filter = filter.split('\n')
+            filter.insert(0, 'def filter(__locale__, kw):')
+            filter = '\n    '.join(filter)
+            exec filter in namespace, self.__dict__
 
     @keep_context
     def format(self, **kw):
@@ -109,7 +117,7 @@ class Message(NamedObject):
         params = self.defaults.copy()
         params.update(kw)
         if self.filter:
-            self.filter(self.catalog.locale, params)
+            self.filter(self.locale, params)
         msg = self.msg
         if self.key is not None:
             key = self.key.format(**params)
