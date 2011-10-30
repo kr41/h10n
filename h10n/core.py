@@ -37,13 +37,18 @@ class Catalog(NamedObject):
     def __init__(self, name, locale, config):
         self.name = name
         self.locale = locale
+        self._mutex = RLock()
+        # Create messages
         factory = config.pop('factory', None)
         if factory is None and 'messages' in config:
             self.messages = config['messages']
         else:
             self.messages = factory(**config)
-        self.helpers = self._import_helpers()
-        self._mutex = RLock()
+        # Create helpers namespace
+        self.helpers = {'generic': generic, '__builtins__': __builtins__}
+        imports = self.messages.get('__helpers__')
+        if imports:
+            exec dedent(imports) in locals(), self.helpers
 
     @keep_context
     def __getitem__(self, id):
@@ -56,18 +61,8 @@ class Catalog(NamedObject):
         return result
 
     @keep_context
-    def _import_helpers(self):
-        imports = self.messages.get('__helpers__')
-        result = {'generic': generic}
-        if imports is not None:
-            local_keys = key = local_dict = None
-            local_keys = locals().keys()
-            exec dedent(imports)
-            local_dict = locals()
-            for key, obj in local_dict.iteritems():
-                if key not in local_keys:
-                    result[key] = obj
-        return result
+    def get_prototype(self, name):
+        return self.locale[name or '__prototype__']
 
 
 class Message(NamedObject):
@@ -75,10 +70,10 @@ class Message(NamedObject):
 
     key = None
     msg = None
-    defaults = None
     filter = None
+    defaults = {}
 
-    parser = re.compile('\$([a-z_]{1}[a-z_0-9]*)', re.I)
+    _parser = re.compile('\$([a-z_]{1}[a-z_0-9]*)', re.I)
 
     @keep_context
     def __init__(self, name='__prototype__', catalog=None, prototype=None,
@@ -87,27 +82,26 @@ class Message(NamedObject):
         self.catalog = catalog
         if self.catalog is None:
             return
-        prototype = self.catalog.locale[prototype or '__prototype__']
+        prototype = self.catalog.get_prototype(prototype)
         self.key = key or prototype.key
         self.msg = msg or prototype.msg
-        self.defaults = {}
-        self.defaults.update(prototype.defaults or {})
-        self.defaults.update(defaults or {})
-        if filter is not None:
+        self.defaults = prototype.defaults.copy()
+        if defaults:
+            self.defaults.update(defaults)
+        if filter:
+            filter = dedent(filter)
             helpers = self.catalog.helpers
             if '__prototype__' in filter:
-                code = '__prototype__.filter(__locale__, kw)' \
-                       if prototype.filter else ''
-                filter = filter.replace('__prototype__', code)
+                prototype_call = '__prototype__.filter(__locale__, kw)' \
+                                 if prototype.filter else ''
+                filter = filter.replace('__prototype__', prototype_call)
                 helpers = helpers.copy()
                 helpers['__prototype__'] = prototype
-            filter = self.parser.sub(r'kw["\g<1>"]', filter)
-            filter = dedent(filter)
-            code = ['def f(__locale__, kw):']
+            filter = self._parser.sub(r'kw["\g<1>"]', filter)
+            code = ['def filter(__locale__, kw):']
             code.extend(filter.split('\n'))
             code = '\n    '.join(code)
-            exec code in helpers, locals()
-            self.filter = f
+            exec code in helpers, self.__dict__
 
     @keep_context
     def format(self, **kw):
