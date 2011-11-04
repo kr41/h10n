@@ -1,6 +1,7 @@
 import logging
 
 from h10n.core import Locale
+from h10n.source import scan_path
 
 
 logger = logging.getLogger(__name__)
@@ -20,19 +21,41 @@ class Translator(object):
     def __init__(self, name):
         self.name = name
 
-    def configure(self, config):
-        self.default = config['default']
-        self.fallback = config.get('fallback', {})
-        self.strategy = config.get('strategy', 'simple')
-        if self.strategy == 'simple':
+    def configure(self, default, locales=None,
+                  fallback=None, strategy='simple', scan=()):
+        self.default = default
+        self.fallback = fallback or {}
+        if strategy == 'simple':
             self.storage = _simple_storage
-        elif self.strategy == 'thread_local':
+        elif strategy == 'thread_local':
             self.storage = _thread_local_storage
         else:
-            raise ValueError('Invalid strategy "{0}"'.format(self.strategy))
+            raise ValueError('Invalid strategy "{0}"'.format(strategy))
+        locales = locales or {}
+        if isinstance(scan, basestring):
+            scan = (scan,)
+        for path in scan:
+            result = scan_path(path)
+            for name, catalogs in result.iteritems():
+                locale = locales.setdefault(name, {})
+                locale.update(catalogs)
         self.locales = {}
-        for name, catalogs in config['locales'].iteritems():
+        for name, catalogs in locales.iteritems():
             self.locales[name] = Locale(name, self, catalogs)
+
+    def read_config(self, config, prefix='h10n.'):
+        config_tree = {}
+        prefix_len = len(prefix)
+        for key, value in config.iteritems():
+            if key.startswith(prefix):
+                key = key[prefix_len:]
+                path = key.split('.')
+                last = path.pop()
+                branch = config_tree
+                for point in path:
+                    branch = branch.setdefault(point, {})
+                branch[last] = value
+        self.configure(**config_tree)
 
     @property
     def locale(self):
