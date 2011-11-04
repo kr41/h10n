@@ -67,9 +67,9 @@ class Translator(object):
             raise ValueError('Unsupported locale "{0}"'.format(locale))
         self.storage.locale = locale
 
-    def translate(self, id, fallback=None, **params):
+    def translate(self, id, fallback=None, locale=None, **params):
         failed_locales = []
-        locale = self.locale
+        locale = locale or self.locale
         logger.debug('Translate %s.%s', locale, id)
         if fallback is None:
             logger.warning('Empty fallback message on translate %s', id)
@@ -104,6 +104,16 @@ class Message(object):
         self.params = params
         if fallback is None:
             logger.warning('Empty fallback message in %r', self)
+
+    def __call__(self, fallback=None, **params):
+        if params:
+            p = self.params.copy()
+            p.update(params)
+            params = p
+        else:
+            params = self.params
+        fallback = fallback or self.fallback
+        return self.translator.translate(self.id, fallback, **params)
 
     def __repr__(self):
         return '<Message: {0}>'.format(self.id)
