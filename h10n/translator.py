@@ -33,7 +33,7 @@ class Translator(object):
             raise ValueError('Invalid strategy "{0}"'.format(strategy))
         locales = locales or {}
         if isinstance(scan, basestring):
-            scan = (scan,)
+            scan = (path.strip() for path in scan.split(','))
         for path in scan:
             result = scan_path(path)
             for name, catalogs in result.iteritems():
