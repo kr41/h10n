@@ -16,6 +16,27 @@ class Translator(object):
             cls._instances[name] = cls(name)
         return cls._instances[name]
 
+    @classmethod
+    def from_config(cls, config, prefix='h10n.'):
+        instance_key = prefix + 'instance'
+        instance = config.get(instance_key, '__default__')
+        config_tree = {}
+        prefix_len = len(prefix)
+        for key, value in config.iteritems():
+            if key == instance_key:
+                continue
+            if key.startswith(prefix):
+                key = key[prefix_len:]
+                path = key.split('.')
+                last = path.pop()
+                branch = config_tree
+                for point in path:
+                    branch = branch.setdefault(point, {})
+                branch[last] = value
+        instance = cls.get_instance(instance)
+        instance.configure(**config_tree)
+        return instance
+
     encoding = 'utf-8'
 
     def __init__(self, name):
@@ -42,20 +63,6 @@ class Translator(object):
         self.locales = {}
         for name, catalogs in locales.iteritems():
             self.locales[name] = Locale(name, self, catalogs)
-
-    def read_config(self, config, prefix='h10n.'):
-        config_tree = {}
-        prefix_len = len(prefix)
-        for key, value in config.iteritems():
-            if key.startswith(prefix):
-                key = key[prefix_len:]
-                path = key.split('.')
-                last = path.pop()
-                branch = config_tree
-                for point in path:
-                    branch = branch.setdefault(point, {})
-                branch[last] = value
-        self.configure(**config_tree)
 
     @property
     def locale(self):

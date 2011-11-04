@@ -62,16 +62,16 @@ def fallback_test():
     tools.eq_(_('sub-source.message'), 'Message from sub-source')
     tools.eq_(_('_skip.message'), 'Translation Error: en-US._skip.message')
 
-def read_config_test():
-    """ Read Flat Config Test """
-    translator = Translator.get_instance('read_test')
+def from_config_test():
+    """ Translator from Config Test """
     config = {
+        'h10n.instance': 'read_config_test',
         'h10n.default': 'en-US',
         'h10n.fallback.ru-RU': 'en-US',
         'h10n.locales.en-US.test.messages.message': 'Message',
         'h10n.locales.ru-RU': {},
     }
-    translator.read_config(config)
+    translator = Translator.from_config(config)
 
     tools.eq_(translator.translate('test.message'), 'Message')
     translator.locale = 'ru-RU'
