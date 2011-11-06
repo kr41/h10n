@@ -48,9 +48,9 @@ class Translator(object):
         self.default = default
         self.fallback = fallback or {}
         if strategy == 'simple':
-            self.storage = _simple_storage
+            self.storage = _simple_storage()
         elif strategy == 'thread_local':
-            self.storage = _thread_local_storage
+            self.storage = _thread_local_storage()
         else:
             raise ValueError('Invalid strategy "{0}"'.format(strategy))
         locales = locales or {}
