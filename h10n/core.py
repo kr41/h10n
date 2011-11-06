@@ -14,7 +14,7 @@ class Locale(NamedObject):
     def __init__(self, name, translator=None, catalogs=None):
         self.name = name
         self.translator = translator
-        self.lang, self.country = name.split('-')
+        self.language, self.region = name.split('-')
         self.catalogs = {}
         for catalog_name, catalog in catalogs.iteritems():
             if catalog_name in self.catalogs:

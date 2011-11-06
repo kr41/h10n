@@ -42,8 +42,9 @@ class Translator(object):
     def __init__(self, name):
         self.name = name
 
-    def configure(self, default, locales=None,
-                  fallback=None, strategy='simple', scan=()):
+    def configure(self, default, locales=None, available_locales=None,
+                  language_map=None, region_map=None,
+                  fallback=None, strategy='simple', scan=None):
         self.default = default
         self.fallback = fallback or {}
         if strategy == 'simple':
@@ -53,16 +54,25 @@ class Translator(object):
         else:
             raise ValueError('Invalid strategy "{0}"'.format(strategy))
         locales = locales or {}
-        if isinstance(scan, basestring):
-            scan = (path.strip() for path in scan.split(','))
+        scan = _list(scan)
+        available_locales = _list(available_locales)
         for path in scan:
             result = scan_path(path)
             for name, catalogs in result.iteritems():
                 locale = locales.setdefault(name, {})
                 locale.update(catalogs)
         self.locales = {}
+        self.language_map = language_map or {}
+        self.region_map = region_map or {}
         for name, catalogs in locales.iteritems():
-            self.locales[name] = Locale(name, self, catalogs)
+            if available_locales and name not in available_locales:
+                continue
+            locale = Locale(name, self, catalogs)
+            self.locales[name] = locale
+            if language_map is None:
+                self.language_map[locale.language] = name
+            if region_map is None:
+                self.region_map[locale.region] = name
 
     @property
     def locale(self):
@@ -73,6 +83,26 @@ class Translator(object):
         if locale not in self.locales:
             raise ValueError('Unsupported locale "{0}"'.format(locale))
         self.storage.locale = locale
+
+    @property
+    def language(self):
+        return self.locale.language
+
+    @language.setter
+    def language(self, language):
+        if language not in self.language_map:
+            raise ValueError('Unsupported language "{0}"'.format(language))
+        self.locale = self.language_map[language]
+
+    @property
+    def region(self):
+        return self.locale.region
+
+    @region.setter
+    def region(self, region):
+        if region not in self.region_map:
+            raise ValueError('Unsupported region "{0}"'.format(region))
+        self.locale = self.region_map[region]
 
     def translate(self, id, fallback=None, locale=None, **params):
         failed_locales = []
@@ -137,3 +167,10 @@ from threading import local as _thread_local_storage
 class _simple_storage(object):
     """ An utility class to store values """
     pass
+
+def _list(value):
+    if value is None:
+        value = []
+    if isinstance(value, basestring):
+        value = [item.strip() for item in value.split(',')]
+    return value

@@ -33,6 +33,14 @@ def setup():
     translator.configure(**config)
     _ = translator.translate
 
+def maps_test():
+    """ Language and Region maps test """
+    translator = Translator.get_instance('test')
+
+    translator.language = 'ru'
+    tools.eq_(_('test.message'), u'Сообщение')
+    translator.region = 'US'
+    tools.eq_(_('test.message'), 'Message')
 
 def fallback_test():
     """ Translator fallback test """
