@@ -86,7 +86,7 @@ class Translator(object):
 
     @property
     def language(self):
-        return self.locale.language
+        return self.locales[self.locale].language
 
     @language.setter
     def language(self, language):
@@ -96,7 +96,7 @@ class Translator(object):
 
     @property
     def region(self):
-        return self.locale.region
+        return self.locales[self.locale].region
 
     @region.setter
     def region(self, region):
@@ -160,6 +160,9 @@ class Message(object):
 
     def __str__(self):
         return unicode(self).encode(self.translator.encoding)
+
+    def __mod__(self, right):
+        return unicode(self) % right
 
 
 from threading import local as _thread_local_storage
