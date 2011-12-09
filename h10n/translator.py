@@ -134,7 +134,7 @@ class Message(object):
 
     def __init__(self, translator, id, fallback, **params):
         if isinstance(translator, basestring):
-            translator = Translation.get_instance(translator)
+            translator = Translator.get_instance(translator)
         self.translator = translator
         self.id = id
         self.fallback = fallback
