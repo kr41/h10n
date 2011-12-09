@@ -47,7 +47,7 @@ def scan_path(base_path, prefix=''):
                     logger.info('Unsupported file type "{0}"; skipped'.
                                 format(file_path))
                     continue
-                name = prefix + name.replace(os.path.sep, '-')
+                name = prefix + name.replace(os.path.sep, '.')
                 locale[name] = {
                     'factory': file_sources[ext],
                     'path': file_path,

@@ -45,7 +45,7 @@ def setup():
                         'msg': '{a}'
                     },
                     'extension': {
-                        'prototype': 'helpers_test.base',
+                        'prototype': 'helpers_test:base',
                         'filter': """
                             $a = mul($a, $b)
                             __prototype__
@@ -56,7 +56,7 @@ def setup():
                         'filter': """
                             $result = generic.message(
                                 __locale__,
-                                'helpers_test.base', a=1, b=2
+                                'helpers_test:base', a=1, b=2
                             )
                         """,
                         'msg': '{result}'
@@ -70,24 +70,24 @@ def setup():
 def format_test():
     """ Message Format Test """
     # Simple format
-    result = locale['format_test.simple'].format()
+    result = locale['format_test:simple'].format()
     tools.eq_(result, 'Simple Message')
 
     # Format using default parameters and passed ones
-    result = locale['format_test.params'].format(b=20, c=30)
+    result = locale['format_test:params'].format(b=20, c=30)
     tools.eq_(result, 'Parametrized Message with params: a=1 b=20 c=30')
 
     # Format using key and filters
-    result = locale['format_test.key_and_filter'].format(count=2)
+    result = locale['format_test:key_and_filter'].format(count=2)
     tools.eq_(result, '2 messages')
 
 
 def extension_test():
     """ Message Filters Extension Test """
     # Extension of filters
-    result = locale['helpers_test.extension'].format(a=3, b=3)
+    result = locale['helpers_test:extension'].format(a=3, b=3)
     tools.eq_(result, '12')
 
     # Using generic (built-in) helpers
-    result = locale['helpers_test.generic'].format()
+    result = locale['helpers_test:generic'].format()
     tools.eq_(result, '3')

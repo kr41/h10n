@@ -24,8 +24,8 @@ class Locale(NamedObject):
 
     @keep_context
     def __getitem__(self, name):
-        if '.' in name:
-            name, tail = name.split('.', 1)
+        if ':' in name:
+            name, tail = name.split(':', 1)
             return self.catalogs[name][tail]
         return self.catalogs[name]
 

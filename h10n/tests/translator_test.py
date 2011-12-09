@@ -38,23 +38,23 @@ def maps_test():
     translator = Translator.get_instance('test')
 
     translator.language = 'ru'
-    tools.eq_(_('test.message'), u'Сообщение')
+    tools.eq_(_('test:message'), u'Сообщение')
     translator.region = 'US'
-    tools.eq_(_('test.message'), 'Message')
+    tools.eq_(_('test:message'), 'Message')
 
 def fallback_test():
     """ Translator fallback test """
     translator = Translator.get_instance('test')
     translator.locale = 'ru-RU'
 
-    tools.eq_(_('test.fallback'), 'Fallback Message')
-    tools.eq_(_('test.invalid', fallback='Invalid Message'), 'Invalid Message')
-    tools.eq_(_('test.invalid'), 'Translation Error: ru-RU.test.invalid')
+    tools.eq_(_('test:fallback'), 'Fallback Message')
+    tools.eq_(_('test:invalid', fallback='Invalid Message'), 'Invalid Message')
+    tools.eq_(_('test:invalid'), 'Translation Error: ru-RU.test.invalid')
 
 def fallback_test():
     """ Lazy translatable message test """
     translator = Translator.get_instance('test')
-    message = translator.message('test.message')
+    message = translator.message('test:message')
 
     translator.locale = 'en-US'
     tools.eq_(unicode(message), 'Message')
@@ -66,9 +66,9 @@ def fallback_test():
     """ File Sources Test """
     translator = Translator.get_instance('test')
     translator.locale = 'en-US'
-    tools.eq_(_('source.message', count=4), '4 items')
-    tools.eq_(_('sub-source.message'), 'Message from sub-source')
-    tools.eq_(_('_skip.message'), 'Translation Error: en-US._skip.message')
+    tools.eq_(_('source:message', count=4), '4 items')
+    tools.eq_(_('sub.source:message'), 'Message from sub-source')
+    tools.eq_(_('_skip:message'), 'Translation Error: en-US:_skip:message')
 
 def from_config_test():
     """ Translator from Config Test """
@@ -81,6 +81,6 @@ def from_config_test():
     }
     translator = Translator.from_config(config)
 
-    tools.eq_(translator.translate('test.message'), 'Message')
+    tools.eq_(translator.translate('test:message'), 'Message')
     translator.locale = 'ru-RU'
-    tools.eq_(translator.translate('test.message'), 'Message')
+    tools.eq_(translator.translate('test:message'), 'Message')
