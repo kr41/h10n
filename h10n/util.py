@@ -6,15 +6,15 @@ class NamedObject(object):
         return '<{0}: {1}>'.format(self.__class__.__name__, self.name)
 
 
-class ExceptionContext(object):
+class ExceptionContext(NamedObject):
     """ Exception Context """
 
     def __init__(self, obj):
         self.chain = [obj]
 
-    def __repr__(self):
-        chain = ', '.join(repr(obj) for obj in reversed(self.chain))
-        return '<ExceptionContext: [{0}]>'.format(chain)
+    @property
+    def name(self):
+        return repr(self.chain)
 
     @classmethod
     def extend(cls, exception, obj):
@@ -22,8 +22,8 @@ class ExceptionContext(object):
         # Search for existent context in exception arguments
         for arg in reversed(exception.args):
             if isinstance(arg, cls):
-                if arg.chain[-1] is not obj:
-                    arg.chain.append(obj)
+                if obj not in arg.chain:
+                    arg.chain.insert(0, obj)
                 raise
         # Create new context and add it to the end of exception's arguments
         exception.args += (cls(obj),)
