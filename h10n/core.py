@@ -81,18 +81,22 @@ class Message(NamedObject):
 
     @keep_context
     def __init__(self, name='__empty__', locale=None, prototype=None,
-                 key=None, msg=None, defaults=None, filter=None, helpers=None):
+                 key=None, msg=None, defaults=None, properties=None,
+                 filter=None, helpers=None):
         self.name = name
         self.locale = locale
         self.key = key
         self.msg = msg
         self.filter = None
         self.defaults = {}
+        self.properties = Properites()
         if prototype:
             self.key = self.key or prototype.key
             self.msg = self.msg or prototype.msg
             self.defaults.update(prototype.defaults)
+            self.properties.update(prototype.properties)
         self.defaults.update(defaults or {})
+        self.properties.update(properties or {})
         if filter:
             namespace = {
                 'generic': generic,
@@ -123,3 +127,11 @@ class Message(NamedObject):
             key = self.key.format(**params)
             msg = msg[key]
         return msg.format(**params)
+
+
+class Properites(object):
+
+    def update(self, kw):
+        if isinstance(kw, self.__class__):
+            kw = kw.__dict__
+        self.__dict__.update(kw)
