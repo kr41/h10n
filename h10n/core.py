@@ -3,7 +3,7 @@ from textwrap import dedent
 from threading import RLock
 
 from h10n.util import keep_context
-from h10n.util import NamedObject
+from h10n.util import NamedObject, Namespace
 from h10n import helpers as generic
 
 
@@ -74,44 +74,46 @@ class Catalog(NamedObject):
         return message
 
 
-class Message(NamedObject):
+class Message(NamedObject, Namespace):
     """ Localized Message """
 
     _parser = re.compile('\$([a-z_]{1}[a-z_0-9]*)', re.I)
 
     @keep_context
     def __init__(self, name='__empty__', locale=None, prototype=None,
-                 key=None, msg=None, defaults=None, properties=None,
-                 filter=None, helpers=None):
+                 key=None, msg=None, defaults=None, filter=None, helpers=None,
+                 **properties):
         self.name = name
         self.locale = locale
         self.key = key
         self.msg = msg
         self.filter = None
         self.defaults = {}
-        self.properties = Properites()
+        names = self.__dict__.keys()
         if prototype:
             self.key = self.key or prototype.key
             self.msg = self.msg or prototype.msg
             self.defaults.update(prototype.defaults)
-            self.properties.update(prototype.properties)
+            self.extend(prototype, skip=names)
         self.defaults.update(defaults or {})
-        self.properties.update(properties or {})
+        self.extend(properties, skip=names)
         if filter:
             namespace = {
                 'generic': generic,
+                'self': self,
                 '__builtins__': __builtins__,
                 '__prototype__': prototype,
+                '__locale__': self.locale,
             }
             namespace.update(helpers or {})
             filter = dedent(filter)
             if '__prototype__' in filter:
-                prototype_call = '__prototype__.filter(__locale__, kw)' \
+                prototype_call = '__prototype__.filter(self, kw)' \
                                  if prototype and prototype.filter else ''
                 filter = filter.replace('__prototype__', prototype_call)
             filter = self._parser.sub(r'kw["\g<1>"]', filter)
             filter = filter.split('\n')
-            filter.insert(0, 'def filter(__locale__, kw):')
+            filter.insert(0, 'def filter(self, kw):')
             filter = '\n    '.join(filter)
             exec filter in namespace, self.__dict__
 
@@ -121,17 +123,9 @@ class Message(NamedObject):
         params = self.defaults.copy()
         params.update(kw)
         if self.filter:
-            self.filter(self.locale, params)
+            self.filter(self, params)
         msg = self.msg
         if self.key is not None:
             key = self.key.format(**params)
             msg = msg[key]
         return msg.format(**params)
-
-
-class Properites(object):
-
-    def update(self, kw):
-        if isinstance(kw, self.__class__):
-            kw = kw.__dict__
-        self.__dict__.update(kw)

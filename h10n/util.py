@@ -1,3 +1,47 @@
+class Namespace(object):
+
+    def extend(self, d, skip=()):
+        for name, value in d.iteritems():
+            if name.startswith('_') or name in skip:
+                continue
+            self[name] = value
+        return self
+
+    def __getitem__(self, name):
+        if '.' in name:
+            try:
+                name, tail = name.split('.', 1)
+                return self.__dict__[name][tail]
+            except KeyError:
+                # Raise another KeyError to store proper key as argument
+                raise KeyError(name)
+        return self.__dict__[name]
+
+    def __setitem__(self, name, value):
+        if '.' in name:
+            name, tail = name.split('.', 1)
+            if name not in self.__dict__ or \
+               not isinstance(self.__dict__[name], Namespace):
+                self.__dict__[name] = Namespace()
+            self.__dict__[name][tail] = value
+        else:
+            self.__dict__[name] = value
+
+    def get(self, name, default=None):
+        try:
+            return self[name]
+        except KeyError:
+            return default
+
+    def iteritems(self):
+        for name, value in self.__dict__.iteritems():
+            if isinstance(value, Namespace):
+                for subname, subvalue in value.iteritems():
+                    yield '{0}.{1}'.format(name, subname), subvalue
+            else:
+                yield name, value
+
+
 class NamedObject(object):
 
     name = '__empty__'
