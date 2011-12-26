@@ -43,7 +43,7 @@ class Translator(object):
         self.name = name
 
     def configure(self, default, locales=None, available_locales=None,
-                  language_map=None, region_map=None,
+                  lang_map=None, region_map=None,
                   fallback=None, strategy='simple', scan=None):
         self.default = default
         self.fallback = fallback or {}
@@ -62,16 +62,16 @@ class Translator(object):
                 locale = locales.setdefault(name, {})
                 locale.update(catalogs)
         self.locales = {}
-        self.language_map = language_map or {}
+        self.lang_map = lang_map or {}
         self.region_map = region_map or {}
         for name, catalogs in locales.iteritems():
             if available_locales and name not in available_locales:
                 continue
             locale = Locale(name, self, catalogs)
             self.locales[name] = locale
-            if language_map is None:
-                self.language_map[locale.language] = name
-            if region_map is None:
+            if lang_map is None or locale.lang not in lang_map:
+                self.lang_map[locale.lang] = name
+            if region_map is None or locale.region not in region_map:
                 self.region_map[locale.region] = name
 
     @property
@@ -85,14 +85,14 @@ class Translator(object):
         self.storage.locale = locale
 
     @property
-    def language(self):
-        return self.locales[self.locale].language
+    def lang(self):
+        return self.locales[self.locale].lang
 
-    @language.setter
-    def language(self, language):
-        if language not in self.language_map:
-            raise ValueError('Unsupported language "{0}"'.format(language))
-        self.locale = self.language_map[language]
+    @lang.setter
+    def lang(self, lang):
+        if lang not in self.lang_map:
+            raise ValueError('Unsupported lang "{0}"'.format(lang))
+        self.locale = self.lang_map[lang]
 
     @property
     def region(self):
@@ -132,7 +132,7 @@ class Translator(object):
 
 class Message(object):
 
-    def __init__(self, translator, id, fallback, **params):
+    def __init__(self, translator, id, fallback=None, **params):
         if isinstance(translator, basestring):
             translator = Translator.get_instance(translator)
         self.translator = translator

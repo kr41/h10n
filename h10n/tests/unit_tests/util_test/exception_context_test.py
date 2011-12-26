@@ -33,10 +33,7 @@ class Container(NamedObject):
 
 
 def context_test():
-    """ Exception Context Test """
     container = Container(1, Item(1))
-
-    # Context test
     context = None
     try:
         container.test_context()
@@ -44,7 +41,8 @@ def context_test():
         context = e.args[-1]
     tools.eq_(repr(context), '<ExceptionContext: [<Container: 1>, <Item: 1>]>')
 
-    # Duplicate context test
+def duplicate_test():
+    container = Container(1, None)
     context = None
     try:
         container.test_duplicate()

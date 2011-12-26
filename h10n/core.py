@@ -14,7 +14,7 @@ class Locale(NamedObject):
     def __init__(self, name, translator=None, catalogs=None):
         self.name = name
         self.translator = translator
-        self.language, self.region = name.split('-')
+        self.lang, self.region = name.split('-')
         self.catalogs = {}
         for catalog_name, catalog in catalogs.iteritems():
             if catalog_name in self.catalogs:
@@ -39,11 +39,11 @@ class Catalog(NamedObject):
         self.locale = locale
         self._mutex = RLock()
         # Create messages
-        factory = config.pop('factory', None)
-        if factory is None and 'messages' in config:
-            self.source = config['messages']
-        else:
+        if 'factory' in config and callable(config['factory']):
+            factory = config.pop('factory', None)
             self.source = factory(**config)
+        else:
+            self.source = config
         # Create helpers namespace
         self.helpers = {}
         imports = self.source.get('__helpers__')
@@ -89,14 +89,17 @@ class Message(NamedObject, Namespace):
         self.msg = msg
         self.filter = None
         self.defaults = {}
+        self.prototype = prototype
         names = self.__dict__.keys()
-        if prototype:
-            self.key = self.key or prototype.key
-            self.msg = self.msg or prototype.msg
-            self.defaults.update(prototype.defaults)
-            self.extend(prototype, skip=names)
+        if self.prototype:
+            self.key = self.key or self.prototype.key
+            self.msg = self.msg or self.prototype.msg
+            self.defaults.update(self.prototype.defaults)
+            self.extend(self.prototype, skip=names)
         self.defaults.update(defaults or {})
         self.extend(properties, skip=names)
+        if filter is None and self.prototype and self.prototype.filter:
+            filter = '__prototype__'
         if filter:
             namespace = {
                 'generic': generic,
@@ -108,8 +111,10 @@ class Message(NamedObject, Namespace):
             namespace.update(helpers or {})
             filter = dedent(filter)
             if '__prototype__' in filter:
-                prototype_call = '__prototype__.filter(self, kw)' \
-                                 if prototype and prototype.filter else ''
+                if self.prototype and self.prototype.filter:
+                    prototype_call = 'self.prototype.filter(self, kw)'
+                else:
+                    prototype_call = ''
                 filter = filter.replace('__prototype__', prototype_call)
             filter = self._parser.sub(r'kw["\g<1>"]', filter)
             filter = filter.split('\n')
