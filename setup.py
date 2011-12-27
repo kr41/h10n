@@ -17,4 +17,12 @@ setup(
     zip_safe=False,
     test_suite='nose.collector',
     install_requires=[],
+    entry_points = """\
+    [h10n.scanner]
+    path = h10n.source:scan_path
+    asset = h10n.source:scan_asset
+    [h10n.source.file]
+    .yaml = h10n.source:YAMLSource
+    .yml = h10n.source:YAMLSource
+    """,
 )

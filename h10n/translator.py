@@ -1,7 +1,7 @@
 import logging
 
 from h10n.core import Locale
-from h10n.source import scan_path
+from h10n.source import scanner
 
 
 logger = logging.getLogger(__name__)
@@ -56,11 +56,9 @@ class Translator(object):
         locales = locales or {}
         scan = _list(scan)
         available_locales = _list(available_locales)
-        for path in scan:
-            result = scan_path(path)
-            for name, catalogs in result.iteritems():
-                locale = locales.setdefault(name, {})
-                locale.update(catalogs)
+        for name, catalogs in scanner(scan):
+            locale = locales.setdefault(name, {})
+            locale.update(catalogs)
         self.locales = {}
         self.lang_map = lang_map or {}
         self.region_map = region_map or {}
