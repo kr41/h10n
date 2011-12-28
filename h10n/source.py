@@ -26,6 +26,10 @@ def scanner(uri_list):
         except KeyError:
             raise ValueError('Unknown scanner "{0}"'.format(protocol))
 
+def scan_py(spec):
+    if ':' not in spec:
+        spec += ':locales'
+    return pkg_resources.EntryPoint.parse('x={0}'.format(spec)).load(False)
 
 def scan_asset(spec):
     if ':' in spec:

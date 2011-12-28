@@ -39,10 +39,10 @@ class Translator(object):
 
     encoding = 'utf-8'
 
-    def __init__(self, name):
+    def __init__(self, name='__empty__'):
         self.name = name
 
-    def configure(self, default, locales=None, available_locales=None,
+    def configure(self, default=None, locales=None, use_only=None,
                   lang_map=None, region_map=None,
                   fallback=None, strategy='simple', scan=None):
         self.default = default
@@ -55,15 +55,18 @@ class Translator(object):
             raise ValueError('Invalid strategy "{0}"'.format(strategy))
         locales = locales or {}
         scan = _list(scan)
-        available_locales = _list(available_locales)
-        for name, catalogs in scanner(scan):
-            locale = locales.setdefault(name, {})
-            locale.update(catalogs)
+        use_only = _list(use_only)
+        for source in scanner(scan):
+            for name, catalogs in source.iteritems():
+                print name
+                print catalogs
+                locale = locales.setdefault(name, {})
+                locale.update(catalogs)
         self.locales = {}
         self.lang_map = lang_map or {}
         self.region_map = region_map or {}
         for name, catalogs in locales.iteritems():
-            if available_locales and name not in available_locales:
+            if use_only and name not in use_only:
                 continue
             locale = Locale(name, self, catalogs)
             self.locales[name] = locale
@@ -71,6 +74,8 @@ class Translator(object):
                 self.lang_map[locale.lang] = name
             if region_map is None or locale.region not in region_map:
                 self.region_map[locale.region] = name
+        if self.default is None:
+            self.default = self.locales.keys()[0]
 
     @property
     def locale(self):
