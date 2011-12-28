@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from nose import tools
-from threading import Thread
 
 from h10n.translator import Translator, Message
 
