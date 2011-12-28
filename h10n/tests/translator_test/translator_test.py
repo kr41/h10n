@@ -99,22 +99,22 @@ def scan_test():
     # As string
     translator = Translator()
     translator.configure(
-        scan='py://h10n.tests.unit_tests.translator_test.translator_test'
+        scan='py://h10n.tests.translator_test.translator_test'
     )
     tools.eq_(translator.locales.keys(), locales.keys())
 
     # As comma-separated
     translator = Translator()
     translator.configure(
-        scan='py://h10n.tests.unit_tests.translator_test.translator_test, '
-             'py://h10n.tests.unit_tests.translator_test.translator_test:locales'
+        scan='py://h10n.tests.translator_test.translator_test, '
+             'py://h10n.tests.translator_test.translator_test:locales'
     )
     tools.eq_(translator.locales.keys(), locales.keys())
 
     # As list
     translator = Translator()
     translator.configure(
-        scan=['py://h10n.tests.unit_tests.translator_test.translator_test']
+        scan=['py://h10n.tests.translator_test.translator_test']
     )
     tools.eq_(translator.locales.keys(), locales.keys())
 

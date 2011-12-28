@@ -20,10 +20,10 @@ locales = {
 
 def scan_py_test():
     # Implicit form
-    result = scan_py('h10n.tests.unit_tests.source_test.scanner_test')
+    result = scan_py('h10n.tests.source_test.scanner_test')
     tools.eq_(result, locales)
     # Explicit form
-    result = scan_py('h10n.tests.unit_tests.source_test.scanner_test:locales')
+    result = scan_py('h10n.tests.source_test.scanner_test:locales')
     tools.eq_(result, locales)
 
 def scan_path_test():
@@ -31,13 +31,13 @@ def scan_path_test():
     tools.eq_(result, locales)
 
 def scan_asset_test():
-    result = scan_asset('h10n.tests.unit_tests.source_test:assets')
+    result = scan_asset('h10n.tests.source_test:assets')
     tools.eq_(result, locales)
 
 def scanner_test():
-    scan = ['py://h10n.tests.unit_tests.source_test.scanner_test',
+    scan = ['py://h10n.tests.source_test.scanner_test',
             'path://{0}'.format(path),
-            'asset://h10n.tests.unit_tests.source_test:assets']
+            'asset://h10n.tests.source_test:assets']
     result = list(scanner(scan))
     tools.eq_(result[0], locales)
     tools.eq_(result[1], locales)
