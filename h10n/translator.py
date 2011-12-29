@@ -1,6 +1,6 @@
 import logging
 
-from h10n.core import Locale
+from h10n.core import Locale, HelperNamespace
 from h10n.source import scanner
 
 
@@ -44,7 +44,7 @@ class Translator(object):
 
     def configure(self, default=None, locales=None, use_only=None,
                   lang_map=None, region_map=None,
-                  fallback=None, strategy='simple', scan=None):
+                  fallback=None, strategy='simple', scan=None, helper=None):
         self.default = default
         self.fallback = fallback or {}
         if strategy == 'simple':
@@ -78,6 +78,9 @@ class Translator(object):
                 self.region_map[locale.region] = name
         if self.default is None:
             self.default = self.locales.keys()[0]
+        if helper:
+            for locale in self.locales.itervalues():
+                locale.helper = HelperNamespace(locale, helper)
 
     @property
     def locale(self):
@@ -108,6 +111,10 @@ class Translator(object):
         if region not in self.region_map:
             raise ValueError('Unsupported region "{0}"'.format(region))
         self.locale = self.region_map[region]
+
+    @property
+    def helper(self):
+        return self.locales[self.locale].helper
 
     def translate(self, id, fallback=None, locale=None, **params):
         failed_locales = []

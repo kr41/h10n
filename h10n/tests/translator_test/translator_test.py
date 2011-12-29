@@ -140,3 +140,16 @@ def thread_local_strategy_test():
     thread.start()
     thread.join()
     tools.eq_(translator.locale, 'ru-RU')
+
+def helper_test():
+    translator = Translator()
+    translator.configure(locales={'en-US': {}, 'ru-RU': {}},
+                         helper={'pluralize': 'h10n#pluralize'})
+    translator.locale = 'en-US'
+    tools.eq_(translator.helper.pluralize(1), 0)
+    tools.eq_(translator.helper.pluralize(3), 1)
+    tools.eq_(translator.helper.pluralize(5), 1)
+    translator.locale = 'ru-RU'
+    tools.eq_(translator.helper.pluralize(1), 0)
+    tools.eq_(translator.helper.pluralize(3), 1)
+    tools.eq_(translator.helper.pluralize(5), 2)
