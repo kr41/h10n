@@ -55,3 +55,8 @@ def prototype_filter_extend_test():
         $b += $c
     """)
     tools.eq_(msg.format(a=10, c=3), '33')
+
+def passing_helper_test():
+    helper = object()
+    msg = Message(filter='$r = repr(helper)', msg='{r}', helper=helper)
+    tools.eq_(msg.format(), repr(helper))

@@ -24,8 +24,9 @@ def custom_source_test():
     class SourceFactory(dict):
         log = []
         def __getitem__(self, key):
+            result = dict.__getitem__(self, key)
             self.log.append('get {0}'.format(key))
-            return dict.__getitem__(self, key)
+            return result
         def __setitem__(self, key, value):
             self.log.append('set {0}: {1}'.format(key, type(value)))
             return dict.__setitem__(self, key, value)
@@ -42,3 +43,26 @@ def factory_keyword_test():
         'factory': 'Is not callable == Regular message',
     })
     tools.eq_(catalog['factory'].format(), 'Is not callable == Regular message')
+
+def helper_test():
+    class FakeLocale(object):
+        lang = 'en'
+        region = 'US'
+        name = 'en-US'
+    catalog = Catalog('Test', FakeLocale(), {
+        '__helper__': {
+            'pluralize': 'h10n#pluralize'
+        },
+        'msg': {
+            'filter': '$form = helper.pluralize($count)',
+            'key': '{form}',
+            'msg': {
+                '0': '{count} item',
+                '1': '{count} items',
+            }
+        }
+    })
+    tools.eq_(catalog.helper.pluralize(1), 0)
+    tools.eq_(catalog.helper.pluralize(2), 1)
+    tools.eq_(catalog['msg'].format(count=1), '1 item')
+    tools.eq_(catalog['msg'].format(count=5), '5 items')

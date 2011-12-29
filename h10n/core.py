@@ -1,4 +1,5 @@
 import re
+from pkg_resources import load_entry_point
 from textwrap import dedent
 from threading import RLock
 
@@ -39,6 +40,11 @@ class Catalog(NamedObject):
             self.source = factory(**config)
         else:
             self.source = config
+        try:
+            self.helper = HelperNamespace(self.locale,
+                                          self.source['__helper__'])
+        except KeyError:
+            self.helper = None
 
     @keep_context
     def __getitem__(self, name):
@@ -52,6 +58,7 @@ class Catalog(NamedObject):
                 if message.get('prototype'):
                     message['prototype'] = self.locale[message['prototype']]
                 message = self.source[name] = Message(name, self.locale,
+                                                      helper=self.helper,
                                                       **message)
         return message
 
@@ -63,7 +70,8 @@ class Message(NamedObject, Namespace):
 
     @keep_context
     def __init__(self, name='__empty__', locale=None, prototype=None,
-                 key=None, msg=None, defaults=None, filter=None, **properties):
+                 key=None, msg=None, defaults=None, filter=None, helper=None,
+                 **properties):
         self.name = name
         self.locale = locale
         self.key = key
@@ -93,7 +101,7 @@ class Message(NamedObject, Namespace):
             filter = filter.split('\n')
             filter.insert(0, 'def filter(self, kw):')
             filter = '\n    '.join(filter)
-            exec filter in {'self': self}, self.__dict__
+            exec filter in {'self': self, 'helper': helper}, self.__dict__
 
     @keep_context
     def format(self, **kw):
@@ -107,3 +115,23 @@ class Message(NamedObject, Namespace):
             key = self.key.format(**params)
             msg = msg[key]
         return msg.format(**params)
+
+
+class HelperNamespace(Namespace):
+
+    _registry = {}
+
+    @classmethod
+    def load_helper(cls, locale, helper):
+        if (locale.name, helper) not in cls._registry:
+            dist, entry_point = helper.split('#')
+            factory = load_entry_point(dist, 'h10n.helper', entry_point)
+            cls._registry[locale.name, helper] = factory(locale.lang,
+                                                         locale.region)
+        return cls._registry[locale.name, helper]
+
+    def __init__(self, locale, helpers):
+        properties = {}
+        for alias, helper in helpers.iteritems():
+            properties[alias] = self.__class__.load_helper(locale, helper)
+        self.extend(properties)
