@@ -16,9 +16,6 @@ class Locale(NamedObject):
         self.lang, self.region = name.split('-')
         self.catalogs = {}
         for catalog_name, catalog in catalogs.iteritems():
-            if catalog_name in self.catalogs:
-                raise ValueError('Duplicate catalog name "{0}": {1}'.
-                                 format(catalog_name, repr(catalog)))
             self.catalogs[catalog_name] = Catalog(catalog_name, self, catalog)
 
     @keep_context

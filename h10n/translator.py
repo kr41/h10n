@@ -58,10 +58,12 @@ class Translator(object):
         use_only = _list(use_only)
         for source in scanner(scan):
             for name, catalogs in source.iteritems():
-                print name
-                print catalogs
                 locale = locales.setdefault(name, {})
-                locale.update(catalogs)
+                for catalog_name, catalog_properties in catalogs.iteritems():
+                    if catalog_name in locale:
+                        logger.warning('Overriding catalog %s:%s',
+                                       name, catalog_name)
+                    locale[catalog_name] = catalog_properties
         self.locales = {}
         self.lang_map = lang_map or {}
         self.region_map = region_map or {}
