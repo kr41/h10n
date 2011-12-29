@@ -19,10 +19,11 @@ def invalid_extend_test():
     obj = Namespace().extend({'_a': 1})
     obj._a
 
-@tools.raises(AttributeError)
-def extend_with_skips_test():
-    obj = Namespace().extend({'a': 1}, ('a'))
-    obj.a
+def freeze_test():
+    obj = Namespace().extend({'a': 1})
+    obj.freeze()
+    obj.extend({'a': 2})
+    tools.eq_(obj.a, 1)
 
 def getter_test():
     obj_1 = object()

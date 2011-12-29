@@ -1,11 +1,16 @@
 class Namespace(object):
 
-    def extend(self, d, skip=()):
+    _frozen = ()
+
+    def extend(self, d):
         for name, value in d.iteritems():
-            if name.startswith('_') or name in skip:
+            if name.startswith('_') or name in self._frozen:
                 continue
             self[name] = value
         return self
+
+    def freeze(self):
+        self._frozen = [name for name in dir(self) if not name.startswith('_')]
 
     def __getitem__(self, name):
         if '.' in name:

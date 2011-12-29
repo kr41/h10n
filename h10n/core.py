@@ -74,14 +74,14 @@ class Message(NamedObject, Namespace):
         self.filter = None
         self.defaults = {}
         self.prototype = prototype
-        names = self.__dict__.keys()
+        self.freeze()
         if self.prototype:
             self.key = self.key or self.prototype.key
             self.msg = self.msg or self.prototype.msg
             self.defaults.update(self.prototype.defaults)
-            self.extend(self.prototype, skip=names)
+            self.extend(self.prototype)
         self.defaults.update(defaults or {})
-        self.extend(properties, skip=names)
+        self.extend(properties)
         if filter is None and self.prototype and self.prototype.filter:
             filter = '__prototype__'
         if filter:
