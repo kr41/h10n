@@ -1,4 +1,5 @@
 import logging
+import re
 
 from h10n.core import Locale, HelperNamespace
 from h10n.source import scanner
@@ -22,15 +23,22 @@ class Translator(object):
         instance = config.get(instance_key, '__default__')
         config_tree = {}
         prefix_len = len(prefix)
+        dotted_name = re.compile('\[([\.\w\_]+)\]', re.I)
         for key, value in config.iteritems():
             if key == instance_key:
                 continue
             if key.startswith(prefix):
                 key = key[prefix_len:]
+                dotted_names = dotted_name.findall(key)
+                if dotted_names:
+                    dotted_names.reverse()
+                    key = dotted_name.sub('###dotted_name###', key)
                 path = key.split('.')
                 last = path.pop()
                 branch = config_tree
                 for point in path:
+                    if point == '###dotted_name###':
+                        point = dotted_names.pop()
                     branch = branch.setdefault(point, {})
                 branch[last] = value
         instance = cls.get_instance(instance)

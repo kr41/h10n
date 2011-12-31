@@ -122,11 +122,12 @@ def scan_test():
 def from_config_test():
     config = {
         'h10n.instance': 'read_config_test',
-        # TODO: Dotted catalog name is not available in this syntax
         'h10n.locales.en-US.test.message': 'Message',
+        'h10n.locales.en-US.[test.dotted.name].message': 'Message',
     }
     translator = Translator.from_config(config)
     tools.eq_(translator.translate('test:message'), 'Message')
+    tools.eq_(translator.translate('test.dotted.name:message'), 'Message')
 
 def thread_local_strategy_test():
     translator = Translator.get_instance('thread_local_test')
