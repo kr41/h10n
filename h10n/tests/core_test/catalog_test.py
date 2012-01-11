@@ -4,6 +4,7 @@ from h10n.core import Catalog, Message
 
 
 def compile_message_test():
+    """ h10n.core.Catalog: compile message """
     prototype = Message(msg='Prototype')
     fake_locale = {'other_catalog:prototype': prototype}
     catalog = Catalog('Test', fake_locale, {
@@ -21,6 +22,7 @@ def compile_message_test():
     tools.eq_(catalog['from_prototype'].prototype, prototype)
 
 def custom_source_test():
+    """ h10n.core.Catalog: using source factory """
     class SourceFactory(dict):
         log = []
         def __getitem__(self, key):
@@ -39,12 +41,14 @@ def custom_source_test():
                                   "set msg: <class 'h10n.core.Message'>"])
 
 def factory_keyword_test():
+    """ h10n.core.Catalog: using factory keyword """
     catalog = Catalog('Test', None, {
         'factory': 'Is not callable == Regular message',
     })
     tools.eq_(catalog['factory'].format(), 'Is not callable == Regular message')
 
 def helper_test():
+    """ h10n.core.Catalog: using helpers """
     class FakeLocale(object):
         lang = 'en'
         region = 'US'

@@ -6,6 +6,7 @@ from h10n.translator import Translator
 
 
 def default_locale_test():
+    """ h10n.translator.Translator: using default locale """
     locales = {'en-US': {}, 'ru-RU': {}}
 
     # Explicit setup of default locale
@@ -19,6 +20,7 @@ def default_locale_test():
     tools.ok_(translator.locale in locales)
 
 def maps_test():
+    """ h10n.translator.Translator: using language and region maps """
     # Implicit map create
     translator = Translator()
     translator.configure(locales={'en-US': {}, 'ru-RU': {}})
@@ -49,6 +51,7 @@ def maps_test():
               {'US': 'en-US', 'GB': 'en-GB', 'KZ': 'ru-KZ'})
 
 def use_only_test():
+    """ h10n.translator.Translator: using use_only parameter """
     # As string
     translator = Translator()
     translator.configure(locales={'en-US': {}, 'ru-RU': {}},
@@ -68,6 +71,7 @@ def use_only_test():
     tools.eq_(translator.locales.keys(), ['ru-RU', 'en-US'])
 
 def translate_test():
+    """ h10n.translator.Translator: translate """
     translator = Translator()
     translator.configure(
         locales={
@@ -96,6 +100,7 @@ def translate_test():
 
 locales = {'en-US': {}, 'ru-RU': {}}
 def scan_test():
+    """ h10n.translator.Translator: using scan """
     # As string
     translator = Translator()
     translator.configure(
@@ -120,6 +125,7 @@ def scan_test():
 
 
 def from_config_test():
+    """ h10n.translator.Translator: using flat config """
     config = {
         'h10n.instance': 'read_config_test',
         'h10n.locales.en-US.test.message': 'Message',
@@ -130,6 +136,7 @@ def from_config_test():
     tools.eq_(translator.translate('test.dotted.name:message'), 'Message')
 
 def thread_local_strategy_test():
+    """ h10n.translator.Translator: using thread_local strategy """
     translator = Translator.get_instance('thread_local_test')
     translator.configure(strategy='thread_local',
                          locales={'en-US': {}, 'ru-RU': {}})
@@ -143,6 +150,7 @@ def thread_local_strategy_test():
     tools.eq_(translator.locale, 'ru-RU')
 
 def helper_test():
+    """ h10n.translator.Translator: using helpers """
     translator = Translator()
     translator.configure(locales={'en-US': {}, 'ru-RU': {}},
                          helper={'pluralize': 'h10n#pluralize'})

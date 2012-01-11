@@ -4,6 +4,7 @@ from h10n.core import Locale, Catalog, Message
 
 
 def test():
+    """ h10n.core.Locale: basic functional """
     locale = Locale('xx-YY', catalogs={
         'catalog': {'message': 'Message'}
     })

@@ -33,6 +33,7 @@ class Container(NamedObject):
 
 
 def context_test():
+    """ h10n.util.ExceptionContext: basic functional """
     container = Container(1, Item(1))
     context = None
     try:
@@ -42,6 +43,7 @@ def context_test():
     tools.eq_(repr(context), '<ExceptionContext: [<Container: 1>, <Item: 1>]>')
 
 def duplicate_test():
+    """ h10n.util.ExceptionContext: prevent duplicates """
     container = Container(1, None)
     context = None
     try:
