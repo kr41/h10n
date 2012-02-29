@@ -55,7 +55,7 @@ def helper_test():
         name = 'en-US'
     catalog = Catalog('Test', FakeLocale(), {
         '__helper__': {
-            'pluralize': 'h10n#pluralize'
+            'pluralize': 'h10n.helper.pluralize:Pluralize'
         },
         'msg': {
             'filter': '$form = helper.pluralize($count)',

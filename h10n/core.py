@@ -1,5 +1,5 @@
 import re
-from pkg_resources import load_entry_point
+import pkg_resources
 from textwrap import dedent
 from threading import RLock
 
@@ -124,8 +124,10 @@ class HelperNamespace(Namespace):
     @classmethod
     def load_helper(cls, locale, helper):
         if (locale.name, helper) not in cls._registry:
-            dist, entry_point = helper.split('#')
-            factory = load_entry_point(dist, 'h10n.helper', entry_point)
+            #dist, entry_point = helper.split('#')
+            entry_point = 'x={0}'.format(helper)
+            factory = pkg_resources.EntryPoint.parse(entry_point).load(False)
+            #factory = load_entry_point(dist, 'h10n.helper', entry_point)
             cls._registry[locale.name, helper] = factory(locale.lang,
                                                          locale.region)
         return cls._registry[locale.name, helper]

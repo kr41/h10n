@@ -25,7 +25,5 @@ setup(
     [h10n.source.file]
     .yaml = h10n.source:YAMLSource
     .yml = h10n.source:YAMLSource
-    [h10n.helper]
-    pluralize = h10n.helper.pluralize:Pluralize
     """,
 )
