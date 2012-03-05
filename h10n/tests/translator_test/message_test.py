@@ -5,8 +5,8 @@ from h10n.translator import Translator, Message
 
 
 def setup():
-    translator = Translator.get_instance('message_test')
-    translator.configure(
+    Translator(
+        name='message_test',
         locales={
             'en-US': {
                 'test': {
@@ -21,6 +21,7 @@ def setup():
         },
         default='en-US',
     )
+
 
 def instance_via_translator_test():
     """ h10n.translator.Message: instance via Translator """

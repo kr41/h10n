@@ -7,25 +7,26 @@ from h10n.source import scanner
 
 logger = logging.getLogger(__name__)
 
+
 class Translator(object):
 
     _instances = {}
 
     @classmethod
-    def get_instance(cls, name='__default__'):
+    def get_instance(cls, name):
         if name not in cls._instances:
             cls._instances[name] = cls(name)
         return cls._instances[name]
 
     @classmethod
     def from_config(cls, config, prefix='h10n.'):
-        instance_key = prefix + 'instance'
-        instance = config.get(instance_key, '__default__')
+        name_key = prefix + 'name'
+        name = config.get(name_key)
         config_tree = {}
         prefix_len = len(prefix)
         dotted_name = re.compile('\[([\.\w\_]+)\]', re.I)
         for key, value in config.iteritems():
-            if key == instance_key:
+            if key == name_key:
                 continue
             if key.startswith(prefix):
                 key = key[prefix_len:]
@@ -41,18 +42,20 @@ class Translator(object):
                         point = dotted_names.pop()
                     branch = branch.setdefault(point, {})
                 branch[last] = value
-        instance = cls.get_instance(instance)
-        instance.configure(**config_tree)
-        return instance
+        return cls(name=name, **config_tree)
 
     encoding = 'utf-8'
 
-    def __init__(self, name='__empty__'):
+    def __init__(self, name=None,
+                 default=None, locales=None, use_only=None,
+                 lang_map=None, region_map=None,
+                 fallback=None, strategy='simple', scan=None, helper=None):
+        if name is not None:
+            if name in self.__class__._instances:
+                raise ValueError('{0!r} already initialized'.format(
+                                 self.__class__._instances[name]))
+            self.__class__._instances[name] = self
         self.name = name
-
-    def configure(self, default=None, locales=None, use_only=None,
-                  lang_map=None, region_map=None,
-                  fallback=None, strategy='simple', scan=None, helper=None):
         self.default = default
         self.fallback = fallback or {}
         if strategy == 'simple':
@@ -89,6 +92,9 @@ class Translator(object):
         if helper:
             for locale in self.locales.itervalues():
                 locale.helper = HelperNamespace(locale, helper)
+
+    def __repr__(self):
+        return 'Translator("{0}")'.format(self.name)
 
     @property
     def locale(self):
@@ -186,10 +192,7 @@ class Message(object):
 
 
 from threading import local as _thread_local_storage
-
-class _simple_storage(object):
-    """ An utility class to store values """
-    pass
+class _simple_storage(object): pass
 
 def _list(value):
     if value is None:
