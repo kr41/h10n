@@ -26,7 +26,7 @@ def setup():
 def instance_via_translator_test():
     """ h10n.translator.Message: instance via Translator """
     translator = Translator.get_instance('message_test')
-    message = translator.message('test:message')
+    message = translator.message('test:message', 'message')
 
     translator.locale = 'en-US'
     tools.eq_(unicode(message), 'Message')
@@ -38,8 +38,8 @@ def instance_via_translator_test():
 def direct_instance_test():
     """ h10n.translator.Message: direct instance """
     translator = Translator.get_instance('message_test')
-    message_1 = Message(translator, 'test:message')
-    message_2 = Message('message_test', 'test:message')
+    message_1 = Message(translator, 'test:message', 'message')
+    message_2 = Message('message_test', 'test:message', 'message')
 
     translator.locale = 'en-US'
     tools.eq_(unicode(message_1), 'Message')

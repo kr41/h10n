@@ -86,12 +86,11 @@ def translate_test():
     )
     translator.locale = 'ru-RU'
 
-    tools.eq_(translator.translate('test:message'), u'Сообщение')
-    tools.eq_(translator.translate('test:fallback'), 'Fallback Message')
-    tools.eq_(translator.translate('test:invalid', fallback='Invalid Message'),
+    tools.eq_(translator.translate('test:message', 'Message'), u'Сообщение')
+    tools.eq_(translator.translate('test:fallback', 'Fallback'),
+              'Fallback Message')
+    tools.eq_(translator.translate('test:invalid', 'Invalid Message'),
               'Invalid Message')
-    tools.eq_(translator.translate('test:invalid'),
-              'Translation Error: ru-RU:test:invalid')
 
 
 locales = {'en-US': {}, 'ru-RU': {}}
@@ -132,8 +131,9 @@ def from_config_test():
     }
     translator = Translator.from_config(config)
     tools.eq_(translator, Translator.get_instance('read_config_test'))
-    tools.eq_(translator.translate('test:message'), 'Message')
-    tools.eq_(translator.translate('test.dotted.name:message'), 'Message')
+    tools.eq_(translator.translate('test:message', 'message'), 'Message')
+    tools.eq_(translator.translate('test.dotted.name:message', 'message'),
+              'Message')
 
 
 def thread_local_strategy_test():

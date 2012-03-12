@@ -196,13 +196,11 @@ class Translator(object):
         """ Get application-level helper namespace from current locale """
         return self.locales[self.locale].helper
 
-    def translate(self, id, fallback=None, locale=None, **params):
+    def translate(self, id, fallback, locale=None, **params):
         """ Perform message translation """
         failed_locales = []
         locale = locale or self.locale
         logger.debug('Translate %s:%s', locale, id)
-        if fallback is None:
-            logger.warning('Empty fallback message on translate %s', id)
         while True:
             try:
                 return self.locales[locale][id].format(**params)
@@ -210,13 +208,11 @@ class Translator(object):
                 logger.error('Translation error %s:%s',
                              locale, id, exc_info=True)
                 failed_locales.append(locale)
-                fallback_locale = self.fallback.get(locale)
+                fallback_locale = self.fallback.get(locale, self.default)
                 if not fallback_locale or fallback_locale in failed_locales:
                     break
                 locale = fallback_locale
                 logger.debug('Fallback to %s', locale)
-        if fallback is None:
-            fallback = 'Translation Error: {0}:{1}'.format(self.locale, id)
         return fallback
 
     def message(self, id, fallback=None, **params):
@@ -225,25 +221,22 @@ class Translator(object):
 
 class Message(object):
 
-    def __init__(self, translator, id, fallback=None, **params):
+    def __init__(self, translator, id, fallback, **params):
         if isinstance(translator, basestring):
             translator = Translator.get_instance(translator)
         self.translator = translator
         self.id = id
         self.fallback = fallback
         self.params = params
-        if fallback is None:
-            logger.warning('Empty fallback message in %r', self)
 
-    def __call__(self, fallback=None, **params):
+    def __call__(self, **params):
         if params:
             p = self.params.copy()
             p.update(params)
             params = p
         else:
             params = self.params
-        fallback = fallback or self.fallback
-        return self.translator.translate(self.id, fallback, **params)
+        return self.translator.translate(self.id, self.fallback, **params)
 
     def __repr__(self):
         return '<Message: {0}>'.format(self.id)
