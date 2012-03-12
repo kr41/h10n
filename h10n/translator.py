@@ -9,40 +9,60 @@ logger = logging.getLogger(__name__)
 
 
 class Translator(object):
+    """
+    A Translator object is used to manage locales and perform translation.
 
+    The Translator accepts a number of arguments: ``name``, ``default``,
+    ``locales``, ``use_only``, ``lang_map``, ``region_map``, ``fallback``,
+    ``strategy``, ``scan`` and ``helper``.
+
+    If the ``name`` argument is passed as non-``None`` value, current instance
+    of translator will be registered in the internal class-level registry.
+    The *named* instance can be accessed later using :meth:`get_instance`
+    class method.
+
+    ..  warning::
+
+        Attempt to initialize translator with name already in use will raise
+        the ``ValueError``.
+
+    The ``default`` argument, if passed, should be a name of default locale.
+
+    The ``locales`` argument, if passed, should be a dictionary object,
+    which store locale names in keys, and arguments for
+    :class:`h10n.core.Locale` class in values.
+
+    The ``use_only`` argument, if passed, should be a list of locale names,
+    which will be used in the translator.  All other locales, passed via
+    ``locales`` or loaded via ``scan``, will be ignored.
+
+    The ``lang_map`` argument, if passed, should be a dictionary
+    object, which store language names in keys, and locale names in values.
+    The language map is used to resolve locale name via language name.
+    The argument is needed only if you want to use :attr:`lang` property
+    to manage locales and have more than one locale per language.
+    For example, ``en-US`` and ``en-GB``.
+
+    The ``region_map`` argument means the same thing as ``lang_map``,
+    but is used to resolve locale via region name, i.e. :attr:`region` property.
+
+    The ``fallback`` argument, if passed, should be a dictionary object,
+    which store locale names in its keys and values.  Is used to resolve
+    fallback order.
+
+    The ``strategy`` argument means how to store name of current locale:
+    globally and non-threadsafe (``simple``, default value) or locally in each
+    thread (``thread_local`` value).
+
+    The ``scan`` argument, if passed, should be a list of URIs to scan for
+    locales.  All loaded locales will override the passed ones via ``locales``
+    argument.
+
+    The ``helper`` argument, if passed, should be a dictionary, which store
+    helper aliases in keys and python path's to helper factories in values.
+    Is used to construct application-level helper namespace.
+    """
     _instances = {}
-
-    @classmethod
-    def get_instance(cls, name):
-        if name not in cls._instances:
-            cls._instances[name] = cls(name)
-        return cls._instances[name]
-
-    @classmethod
-    def from_config(cls, config, prefix='h10n.'):
-        name_key = prefix + 'name'
-        name = config.get(name_key)
-        config_tree = {}
-        prefix_len = len(prefix)
-        dotted_name = re.compile('\[([\.\w\_]+)\]', re.I)
-        for key, value in config.iteritems():
-            if key == name_key:
-                continue
-            if key.startswith(prefix):
-                key = key[prefix_len:]
-                dotted_names = dotted_name.findall(key)
-                if dotted_names:
-                    dotted_names.reverse()
-                    key = dotted_name.sub('###dotted_name###', key)
-                path = key.split('.')
-                last = path.pop()
-                branch = config_tree
-                for point in path:
-                    if point == '###dotted_name###':
-                        point = dotted_names.pop()
-                    branch = branch.setdefault(point, {})
-                branch[last] = value
-        return cls(name=name, **config_tree)
 
     encoding = 'utf-8'
 
@@ -94,10 +114,53 @@ class Translator(object):
                 locale.helper = HelperNamespace(locale, helper)
 
     def __repr__(self):
-        return 'Translator("{0}")'.format(self.name)
+        return 'Translator({0!r})'.format(self.name)
+
+    @classmethod
+    def get_instance(cls, name):
+        """ Get a *named* instance from the registry """
+        if name not in cls._instances:
+            cls._instances[name] = cls(name)
+        return cls._instances[name]
+
+    @classmethod
+    def from_config(cls, config, prefix='h10n.'):
+        """ Create Translator from flat configuration
+
+        A ``config`` argument should be a dictionary, which provide arguments
+        for default constructor.  All nested dictionaries should be flatten
+        using dot-separated keys.  The keys, which contain dots, should be
+        escaped using square brackets.  If ``prefix`` argument is passed
+        as non-empty string, all non-prefixed keys from ``config``
+        will be ignored.
+        """
+        name_key = prefix + 'name'
+        name = config.get(name_key)
+        config_tree = {}
+        prefix_len = len(prefix)
+        dotted_name = re.compile('\[([\.\w\_]+)\]', re.I)
+        for key, value in config.iteritems():
+            if key == name_key:
+                continue
+            if key.startswith(prefix):
+                key = key[prefix_len:]
+                dotted_names = dotted_name.findall(key)
+                if dotted_names:
+                    dotted_names.reverse()
+                    key = dotted_name.sub('###dotted_name###', key)
+                path = key.split('.')
+                last = path.pop()
+                branch = config_tree
+                for point in path:
+                    if point == '###dotted_name###':
+                        point = dotted_names.pop()
+                    branch = branch.setdefault(point, {})
+                branch[last] = value
+        return cls(name=name, **config_tree)
 
     @property
     def locale(self):
+        """ Set or get current locale name """
         return self.storage.__dict__.get('locale', self.default)
 
     @locale.setter
@@ -108,6 +171,7 @@ class Translator(object):
 
     @property
     def lang(self):
+        """ Set or get current locale name using language part of the name """
         return self.locales[self.locale].lang
 
     @lang.setter
@@ -118,6 +182,7 @@ class Translator(object):
 
     @property
     def region(self):
+        """ Set or get current locale name using region part of the name """
         return self.locales[self.locale].region
 
     @region.setter
@@ -128,9 +193,11 @@ class Translator(object):
 
     @property
     def helper(self):
+        """ Get application-level helper namespace from current locale """
         return self.locales[self.locale].helper
 
     def translate(self, id, fallback=None, locale=None, **params):
+        """ Perform message translation """
         failed_locales = []
         locale = locale or self.locale
         logger.debug('Translate %s:%s', locale, id)
