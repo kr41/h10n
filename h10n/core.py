@@ -121,19 +121,15 @@ class HelperNamespace(Namespace):
 
     _registry = {}
 
-    @classmethod
-    def load_helper(cls, locale, helper):
-        if (locale.name, helper) not in cls._registry:
-            #dist, entry_point = helper.split('#')
-            entry_point = 'x={0}'.format(helper)
-            factory = pkg_resources.EntryPoint.parse(entry_point).load(False)
-            #factory = load_entry_point(dist, 'h10n.helper', entry_point)
-            cls._registry[locale.name, helper] = factory(locale.lang,
-                                                         locale.region)
-        return cls._registry[locale.name, helper]
-
     def __init__(self, locale, helpers):
         properties = {}
+        cls = self.__class__
         for alias, helper in helpers.iteritems():
-            properties[alias] = self.__class__.load_helper(locale, helper)
+            if (locale.name, helper) not in cls._registry:
+                entry_point = 'x={0}'.format(helper)
+                entry_point = pkg_resources.EntryPoint.parse(entry_point)
+                factory = entry_point.load(False)
+                cls._registry[locale.name, helper] = factory(locale.lang,
+                                                             locale.region)
+            properties[alias] = cls._registry[locale.name, helper]
         self.extend(properties)
