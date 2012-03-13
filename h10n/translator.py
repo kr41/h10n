@@ -14,7 +14,7 @@ class Translator(object):
 
     The Translator accepts a number of keyword arguments: ``name``, ``default``,
     ``locales``, ``use_only``, ``lang_map``, ``region_map``, ``fallback``,
-    ``strategy``, ``scan`` and ``helper``.
+    ``strategy``, ``scan`` and ``helpers``.
 
     If the ``name`` argument is passed as non-``None`` value, current instance
     of translator will be registered in the internal class-level registry.
@@ -58,7 +58,7 @@ class Translator(object):
     locales.  All loaded locales will override the passed ones via ``locales``
     argument.
 
-    The ``helper`` argument, if passed, should be a dictionary, which store
+    The ``helpers`` argument, if passed, should be a dictionary, which store
     helper aliases in keys and python path's to helper factories in values.
     Is used to construct application-level helper namespace.
     """
@@ -69,7 +69,7 @@ class Translator(object):
     def __init__(self, name=None,
                  default=None, locales=None, use_only=None,
                  lang_map=None, region_map=None,
-                 fallback=None, strategy='simple', scan=None, helper=None):
+                 fallback=None, strategy='simple', scan=None, helpers=None):
         if name is not None:
             if name in self.__class__._instances:
                 raise ValueError('{0!r} already initialized'.format(
@@ -109,9 +109,9 @@ class Translator(object):
                 self.region_map[locale.region] = name
         if self.default is None:
             self.default = self.locales.keys()[0]
-        if helper:
+        if helpers:
             for locale in self.locales.itervalues():
-                locale.helper = HelperNamespace(locale, helper)
+                locale.helper = HelperNamespace(locale, helpers)
 
     def __repr__(self):
         return 'Translator({0!r})'.format(self.name)

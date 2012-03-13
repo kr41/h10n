@@ -153,7 +153,7 @@ def helper_test():
     """ h10n.translator.Translator: using helpers """
     translator = Translator(
         locales={'en-US': {}, 'ru-RU': {}},
-        helper={'pluralize': 'h10n.helper.pluralize:Pluralize'}
+        helpers={'pluralize': 'h10n.helper.pluralize:Pluralize'}
     )
     translator.locale = 'en-US'
     tools.eq_(translator.helper.pluralize(1), 0)
