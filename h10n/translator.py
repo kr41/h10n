@@ -12,7 +12,7 @@ class Translator(object):
     """
     A Translator object is used to manage locales and perform translation.
 
-    The Translator accepts a number of arguments: ``name``, ``default``,
+    The Translator accepts a number of keyword arguments: ``name``, ``default``,
     ``locales``, ``use_only``, ``lang_map``, ``region_map``, ``fallback``,
     ``strategy``, ``scan`` and ``helper``.
 
@@ -118,21 +118,51 @@ class Translator(object):
 
     @classmethod
     def get_instance(cls, name):
-        """ Get a *named* instance from the registry """
+        """ Get a *named* instance from the registry:
+
+        ..  code-block:: pycon
+
+            >>> t = Translator(name='t', locales={'en-US': {}})
+            >>> t == Translator.get_instance('t')
+            True
+
+        """
         if name not in cls._instances:
             cls._instances[name] = cls(name)
         return cls._instances[name]
 
     @classmethod
     def from_config(cls, config, prefix='h10n.'):
-        """ Create Translator from flat configuration
+        """ Create Translator from "flat" configuration.
 
         A ``config`` argument should be a dictionary, which provide arguments
         for default constructor.  All nested dictionaries should be flatten
         using dot-separated keys.  The keys, which contain dots, should be
         escaped using square brackets.  If ``prefix`` argument is passed
-        as non-empty string, all non-prefixed keys from ``config``
-        will be ignored.
+        as non-empty string (default is ``h10n.``), all non-prefixed keys
+        from ``config`` will be ignored.
+
+        For example:
+
+        ..  code-block:: pycon
+
+            >>> # This...
+            >>> Translator(locales={
+            ...    'en-US': {
+            ...        'test.catalog': {
+            ...            'msg': u'Message'
+            ...        }
+            ...    }
+            ... })
+            Translator(None)
+
+            >>> # ...is equal to:
+            >>> Translator.from_config({
+            ...     'h10n.locales.en-US.[test.catalog].msg':  u'Message'
+            ... })
+            Translator(None)
+
+
         """
         name_key = prefix + 'name'
         name = config.get(name_key)
@@ -197,7 +227,20 @@ class Translator(object):
         return self.locales[self.locale].helper
 
     def translate(self, id, fallback, locale=None, **params):
-        """ Perform message translation """
+        """ Perform message translation
+
+        An ``id`` argument should be an identifier of the message to translate,
+        i.e. string in format ``{catalog}:{message}``.
+
+        A ``fallback`` argument should be a string, which will be used as
+        result of failed translation.
+
+        A ``locale`` argument, if passed as non-``None`` value, should be a name
+        of locale, which override current one on translation time.
+
+        Other keyword arguments will be passed directly to
+        :meth:`h10n.core.Message.format` method.
+        """
         failed_locales = []
         locale = locale or self.locale
         logger.debug('Translate %s:%s', locale, id)
@@ -216,10 +259,25 @@ class Translator(object):
         return fallback
 
     def message(self, id, fallback=None, **params):
+        """
+        Factory for lazy translatable messages.  Creates :class:`Message` object
+        using ``self`` as ``translator`` argument.
+        """
         return Message(self, id, fallback, **params)
 
 
 class Message(object):
+    """
+    A Message object is used for lazy translatable messages.
+
+    A ``translator`` argument must be an instance or name of instance of
+    :class:`Translator` class.  All other arguments are the same as for
+    :meth:`Translator.translate` method.
+
+    The Message object will be translated implicitly on convert into
+    ``unicode`` or ``str``.  It also can be called to be translate explicitly.
+    Passed on call keyword arguments will override passed ones via constructor.
+    """
 
     def __init__(self, translator, id, fallback, **params):
         if isinstance(translator, basestring):
