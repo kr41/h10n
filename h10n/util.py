@@ -1,8 +1,53 @@
 class Namespace(object):
+    """
+    Namespace is an utility object, which mimics to JavaScript object.
+    The Namespace provides methods to manipulate attributes using subscription
+    interface:
+
+    ..  code-block:: pycon
+
+        >>> ns = Namespace()
+        >>> ns.a = 1
+        >>> ns['a']
+        1
+        >>> ns['a'] = 2
+        >>> ns.a
+        2
+        >>> ns['b.c'] = 3
+        >>> ns.b.c
+        3
+        >>> ns.b                                     # doctest: +ELLIPSIS
+        <h10n.util.Namespace object at ...>
+
+    """
 
     _frozen = ()
 
     def extend(self, d):
+        """
+        Extends namespace by attributes from dictionary or another namespace.
+        Dot-separated keys in the dictionary becomes to nested namespace.
+
+        ..  code-block:: pycon
+
+            >>> ns = Namespace().extend({'a.b': 1, 'c': 2})
+            >>> ns.a.b
+            1
+            >>> ns.c
+            2
+            >>> ns.a                                 # doctest: +ELLIPSIS
+            <h10n.util.Namespace object at ...>
+            >>> ns_2 = Namespace().extend({'c': 3, 'd': 4, 'a.e': 5})
+            >>> ns.extend(ns_2)                      # doctest: +ELLIPSIS
+            <h10n.util.Namespace object at ...>
+            >>> ns.c
+            3
+            >>> ns.d
+            4
+            >>> ns.a.e
+            5
+
+        """
         for name, value in d.iteritems():
             if name.startswith('_') or name in self._frozen:
                 continue
@@ -10,6 +55,17 @@ class Namespace(object):
         return self
 
     def freeze(self):
+        """
+        Freeze current attributes of namespace to prevent overriding via extend.
+
+        ..  code-block:: pycon
+
+            >>> ns = Namespace().extend({'a': 1})
+            >>> ns.freeze()
+            >>> ns.extend({'a': 2}).a
+            1
+
+        """
         self._frozen = [name for name in dir(self) if not name.startswith('_')]
 
     def __getitem__(self, name):
@@ -48,6 +104,20 @@ class Namespace(object):
 
 
 class NamedObject(object):
+    """
+    An utility base class for named objects, which is used in the exception
+    context.  See :class:`ExceptionContext` doc-strings.
+
+    ..  code-block:: pycon
+
+        >>> no = NamedObject()
+        >>> no
+        <NamedObject: __empty__>
+        >>> no.name = 'test'
+        >>> no
+        <NamedObject: test>
+
+    """
 
     name = '__empty__'
 
