@@ -13,7 +13,7 @@ class Translator(object):
     A Translator object is used to manage locales and perform translation.
 
     The Translator accepts a number of keyword arguments: ``name``, ``default``,
-    ``locales``, ``use_only``, ``lang_map``, ``region_map``, ``fallback``,
+    ``locales``, ``use_only``, ``lang_map``, ``country_map``, ``fallback``,
     ``strategy``, ``scan`` and ``helpers``.
 
     If the ``name`` argument is passed as non-``None`` value, current instance
@@ -43,8 +43,8 @@ class Translator(object):
     to manage locales and have more than one locale per language.
     For example, ``en-US`` and ``en-GB``.
 
-    The ``region_map`` argument means the same thing as ``lang_map``,
-    but is used to resolve locale via region name, i.e. :attr:`region` property.
+    The ``country_map`` argument means the same thing as ``lang_map``,
+    but is used to resolve locale via country name, i.e. :attr:`country` property.
 
     The ``fallback`` argument, if passed, should be a dictionary object,
     which store locale names in its keys and values.  Is used to resolve
@@ -68,7 +68,7 @@ class Translator(object):
 
     def __init__(self, name=None,
                  default=None, locales=None, use_only=None,
-                 lang_map=None, region_map=None,
+                 lang_map=None, country_map=None,
                  fallback=None, strategy='simple', scan=None, helpers=None):
         if name is not None:
             if name in self.__class__._instances:
@@ -97,7 +97,7 @@ class Translator(object):
                     locale[catalog_name] = catalog_properties
         self.locales = {}
         self.lang_map = lang_map or {}
-        self.region_map = region_map or {}
+        self.country_map = country_map or {}
         for name, catalogs in locales.iteritems():
             if use_only and name not in use_only:
                 continue
@@ -105,8 +105,8 @@ class Translator(object):
             self.locales[name] = locale
             if lang_map is None or locale.lang not in lang_map:
                 self.lang_map[locale.lang] = name
-            if region_map is None or locale.region not in region_map:
-                self.region_map[locale.region] = name
+            if country_map is None or locale.country not in country_map:
+                self.country_map[locale.country] = name
         if self.default is None:
             self.default = self.locales.keys()[0]
         if helpers:
@@ -211,15 +211,15 @@ class Translator(object):
         self.locale = self.lang_map[lang]
 
     @property
-    def region(self):
-        """ Set or get current locale name using region part of the name """
-        return self.locales[self.locale].region
+    def country(self):
+        """ Set or get current locale name using country part of the name """
+        return self.locales[self.locale].country
 
-    @region.setter
-    def region(self, region):
-        if region not in self.region_map:
-            raise ValueError('Unsupported region "{0}"'.format(region))
-        self.locale = self.region_map[region]
+    @country.setter
+    def country(self, country):
+        if country not in self.country_map:
+            raise ValueError('Unsupported country "{0}"'.format(country))
+        self.locale = self.country_map[country]
 
     @property
     def helper(self):

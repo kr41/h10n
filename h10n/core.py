@@ -14,7 +14,7 @@ class Locale(NamedObject):
 
     The ``name`` argument should be a locale name in format ``xx-YY``, where
     ``xx`` is language code and ``YY`` is country code.  Name itself, language
-    and country codes can be accessed via ``name``, ``lang`` and ``region``
+    and country codes can be accessed via ``name``, ``lang`` and ``country``
     attributes of the Locale object.
 
     The ``translator`` argument should be an instance of
@@ -44,7 +44,7 @@ class Locale(NamedObject):
     def __init__(self, name, translator=None, catalogs=None):
         self.name = name
         self.translator = translator
-        self.lang, self.region = name.split('-')
+        self.lang, self.country = name.split('-')
         self.catalogs = {}
         for catalog_name, catalog in catalogs.iteritems():
             self.catalogs[catalog_name] = Catalog(catalog_name, self, catalog)
@@ -316,6 +316,6 @@ class HelperNamespace(Namespace):
                 entry_point = pkg_resources.EntryPoint.parse(entry_point)
                 factory = entry_point.load(False)
                 cls._registry[locale.name, helper] = factory(locale.lang,
-                                                             locale.region)
+                                                             locale.country)
             properties[alias] = cls._registry[locale.name, helper]
         self.extend(properties)

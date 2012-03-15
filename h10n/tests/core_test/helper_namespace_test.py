@@ -4,7 +4,7 @@ from h10n.core import HelperNamespace
 
 class FakeLocale(object):
     lang = 'en'
-    region = 'US'
+    country = 'US'
     name = 'en-US'
 
 def base_test():

@@ -19,32 +19,32 @@ def default_locale_test():
 
 
 def maps_test():
-    """ h10n.translator.Translator: using language and region maps """
+    """ h10n.translator.Translator: using language and country maps """
     # Implicit map create
     translator = Translator(locales={'en-US': {}, 'ru-RU': {}})
     tools.eq_(translator.lang_map, {'en': 'en-US', 'ru': 'ru-RU'})
-    tools.eq_(translator.region_map, {'US': 'en-US', 'RU': 'ru-RU'})
+    tools.eq_(translator.country_map, {'US': 'en-US', 'RU': 'ru-RU'})
 
     # Lang property usage
     translator.lang = 'ru'
     tools.eq_(translator.lang, 'ru')
-    tools.eq_(translator.region, 'RU')
+    tools.eq_(translator.country, 'RU')
     tools.eq_(translator.locale, 'ru-RU')
 
-    # Region property usage
-    translator.region = 'US'
+    # country property usage
+    translator.country = 'US'
     tools.eq_(translator.lang, 'en')
-    tools.eq_(translator.region, 'US')
+    tools.eq_(translator.country, 'US')
     tools.eq_(translator.locale, 'en-US')
 
     # Merge implicitly created map items with explicitly ones
     translator = Translator(locales={'en-US': {}, 'en-GB': {},
                                      'ru-KZ': {}, 'kz-KZ': {}},
                             lang_map={'en': 'en-US'},
-                            region_map={'KZ': 'ru-KZ'})
+                            country_map={'KZ': 'ru-KZ'})
     tools.eq_(translator.lang_map,
               {'en': 'en-US', 'ru': 'ru-KZ', 'kz': 'kz-KZ'})
-    tools.eq_(translator.region_map,
+    tools.eq_(translator.country_map,
               {'US': 'en-US', 'GB': 'en-GB', 'KZ': 'ru-KZ'})
 
 

@@ -51,7 +51,7 @@ def helper_test():
     """ h10n.core.Catalog: using helpers """
     class FakeLocale(object):
         lang = 'en'
-        region = 'US'
+        country = 'US'
         name = 'en-US'
     catalog = Catalog('Test', FakeLocale(), {
         '__helper__': {

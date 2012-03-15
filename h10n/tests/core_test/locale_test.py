@@ -13,7 +13,7 @@ def test():
 
     tools.eq_(locale.name, 'xx-YY')
     tools.eq_(locale.lang, 'xx')
-    tools.eq_(locale.region, 'YY')
+    tools.eq_(locale.country, 'YY')
     tools.ok_(isinstance(catalog, Catalog))
     tools.ok_(isinstance(message, Message))
     tools.eq_(catalog.name, 'catalog')

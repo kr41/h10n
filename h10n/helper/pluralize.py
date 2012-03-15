@@ -1,6 +1,6 @@
 class Pluralize(object):
 
-    def __init__(self, lang, region):
+    def __init__(self, lang, country):
         self._call = getattr(self, lang)
 
     def __call__(self, count):
