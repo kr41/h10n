@@ -5,3 +5,4 @@ h10n.komodoproject
 h10n.egg-info
 *.pyc
 *.~
+docs/_build/
