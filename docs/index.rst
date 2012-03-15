@@ -6,8 +6,17 @@ Python_ programming language.  Abbreviation "h10n" means "Humanization".
 
 .. _Python: http://www.python.org/
 
-API Documentation
------------------
+Narrative
+---------
+
+..  toctree::
+    :maxdepth: 2
+
+    narrative/the_problem
+    narrative/tutorial
+
+API References
+--------------
 
 ..  toctree::
     :maxdepth: 1
