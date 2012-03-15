@@ -126,7 +126,11 @@ class NamedObject(object):
 
 
 class ExceptionContext(NamedObject):
-    """ Exception Context """
+    """
+    An Exception Context is utility object to store context in the exception
+    arguments.  The Exception Context is used via :func:`keep_context`
+    decorator.
+    """
 
     def __init__(self, obj):
         self.chain = [obj]
@@ -150,7 +154,23 @@ class ExceptionContext(NamedObject):
 
 
 def keep_context(method):
-    """ Includes context into exception raised from decorated method """
+    """
+    Includes context into exception raised from decorated method.
+
+    ..  code-block:: pycon
+
+        >>> class Test(NamedObject):
+        ...     def __init__(self, name):
+        ...         self.name = name
+        ...     @keep_context
+        ...     def test(self):
+        ...         raise Exception('Test exception')
+        >>> Test('foo').test()
+        Traceback (most recent call last):
+        ...
+        Exception: ('Test exception', <ExceptionContext: [<Test: foo>]>)
+
+    """
     def context_keeper(self, *args, **kwargs):
         try:
             return method(self, *args, **kwargs)
