@@ -80,7 +80,7 @@ class Catalog(NamedObject):
     methods ``__getitem__`` and ``__setitem__``.  First one should return
     message definition or instance of :class:`Message` class.  Second one
     should accept instance of :class:`Message` to store it in cache.  See
-    :module:`h10n.source` doc-string to learn more about message sources.
+    :mod:`h10n.source` doc-string to learn more about message sources.
 
     The message definition should be a string or dictionary.  If it passed as
     string, it is converted to dictionary ``{'msg': 'passed string'}``.
