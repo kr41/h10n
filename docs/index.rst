@@ -13,7 +13,11 @@ Narrative
     :maxdepth: 2
 
     narrative/the_problem
-    narrative/tutorial
+    narrative/basic_translation
+    narrative/filters
+    narrative/helpers
+    narrative/prototypes
+    narrative/debugging
 
 API References
 --------------
