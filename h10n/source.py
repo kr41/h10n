@@ -1,3 +1,21 @@
+"""
+A Source module is used to process different types of message sources.
+
+There are two global variable in the module: ``file_sources`` and ``scanners``.
+
+The ``file_sources`` variable is used by :func:`scan_path` to determine
+supported file types.  It is a dictionary, which contain file extensions
+(with by dot char) in its keys and file source factories in its values.
+This dictionary is filled on import time using entry points from
+``h10n.source.file`` group.  The entry point name is used as file extension.
+
+The ``scanners`` variable is used by :func:`scanner` function to determine
+supported types of scanners.  It is a dictionary, which contain protocol name
+of scanner in its keys, and scanners in its values.  This dictionary is filled
+on import time using entry points from ``h10n.scanner`` group.  The entry point
+name is used as protocol name.
+"""
+
 import os
 import re
 import pkg_resources
@@ -11,14 +29,26 @@ except ImportError:
 
 logger = logging.getLogger(__name__)
 
-class YAMLSource(dict):
 
+class YAMLSource(dict):
+    """ A message source, which extracts message definitions from YAML-files """
     def __init__(self, path):
         with open(path) as f:
             self.update(yaml.load(f, Loader=YAMLLoader))
 
 
 def scanner(uri_list):
+    """
+    A scanner is used to build locale definitions by scanning specified URIs.
+
+    The scanner accepts single argument -- URI list, and returns an iterator
+    over scanning result of each URI.
+
+    URI's protocol is used to determine how to scan particular URI.  It must be
+    a key from the ``scanners`` dictionary from this module.  For example,
+    URI ``asset://myapp.resources:translations`` will be scanned
+    by :func:``asset_scanner``.
+    """
     for uri in uri_list:
         protocol, id = uri.split('://')
         try:
@@ -26,12 +56,27 @@ def scanner(uri_list):
         except KeyError:
             raise ValueError('Unknown scanner "{0}"'.format(protocol))
 
+
 def scan_py(spec):
+    """
+    A scanner of Python modules extracts locale definitions from source code
+    directly.  Accepts ``spec`` argument, which should be a string in format
+    ``modlule.name:locale_definitions``.  If definition part is empty, i.e.
+    ``spec`` is passed as ``module.name``, name ``locales`` is used by default.
+    So, ``module.name`` is equal to ``module.name:locales``.
+    """
     if ':' not in spec:
         spec += ':locales'
     return pkg_resources.EntryPoint.parse('x={0}'.format(spec)).load(False)
 
+
 def scan_asset(spec):
+    """
+    A scanner of Python package assets works the same way as scanner of file
+    system.  See :func:`scan_path` doc-string for details.  Asset specification
+    should be in format ``package.name:asset/path``, where ``asset/path`` is
+    a path, relative to ``package.name`` package path.
+    """
     if ':' in spec:
         package, dir = spec.split(':')
     else:
@@ -39,7 +84,20 @@ def scan_asset(spec):
     path = pkg_resources.resource_filename(package, dir)
     return scan_path(path)
 
+
 def scan_path(base_path):
+    """
+    A scanner of file system extracts locale definitions from directory path.
+    The directory should contain subdirectories, which should be named
+    as locale, using format ``xx-YY`` (all other will be skipped).
+    Each subdirectory is scanned recursively.  Each supported file is used for
+    message catalog, where catalog name is equal to file name without extension
+    relative to locale directory with slashes replaced by dots, i.e.
+    file ``en-US/common/objects.yaml`` will be used as source for catalog
+    ``common.objects`` in locale ``en-US``.  Supported files are detected
+    according its extension, using registry of file sources -- global variable
+    from this module ``file_sources``.
+    """
     if not os.path.isdir(base_path):
         raise ValueError("Can't to scan path {0}".format(base_path))
     result = {}

@@ -23,6 +23,7 @@ API References
 
     api/translator
     api/core
+    api/source
     api/util
 
 
