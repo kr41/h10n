@@ -14,10 +14,12 @@ third level ones -- message names.  Yes, h10n is able to store translation
 catalogs in files, and not only in files.  But for our example will be more
 useful to define all directly in source code.
 
-Than we created a translator.
+Than we created a Translator.  See :class:`h10n.translator.Translator` for
+details.
 
 And finally, we translated messages ``article`` and ``comment`` from
-catalog ``object``.  First argument of ``translate`` method is message full
+catalog ``object``.  First argument
+of :meth:`h10n.translator.Translator.translate` method is message full
 name, i.e. catalog name and message name separated by colon. Second one is
 fallback message, which should be used by translator on fail.
 

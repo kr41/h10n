@@ -10,9 +10,9 @@ There are two interesting things.  Let's start from last one.  We don't added
 catalog ``message`` into Russian locale.  So, translator used English (default)
 locale as fallback one to translate wrong Russian messages.  It also logged
 debug information, but it failed with message "No handlers could be found for
-logger "h10n.translator" (this message will fired to ``stderr`` if you run this
-program), because we didn't configure logger.  We will do it later, on learning
-h10n :ref:`debugging`.
+logger "h10n.translator" (this message will be fired to ``stderr`` if you run
+this program), because we didn't configure logger.  We will do it later,
+on learning h10n :ref:`debugging`.
 
 Most interesting thing is ``message:removed`` translation message, which is
 defined using full form of definition.  The best way to show difference between
@@ -34,7 +34,10 @@ Method ``translate`` of translator object accepts keyword arguments.  When it
 find specified message, it call message's :meth:`h10n.core.Message.format`
 method passing these arguments.  Method ``format`` process provided arguments
 using filter and calls ``format`` method of translation string ``msg``,
-using filtered arguments.
+using filtered arguments (last ``format`` method is standard method of ``str``
+and ``unicode`` objects, see `PEP 3101`_ for details).
+
+..  _`PEP 3101`: http://www.python.org/dev/peps/pep-3101/
 
 So, string::
 
@@ -48,17 +51,17 @@ keyword arguments as second one:
     def filter(self, kw):
         kw['object'] = self.locale['object'][kw['object']].format()
 
-Here we used ``locale`` attribute of message object to get access to parent
-locale.  Method ``__getitem__`` of :class:`h10n.core.Locale` returns catalog
-object.  Method ``__getitem__`` of :class:`h10n.core.Catalog` returns message.
-Method ``format`` of message object returns formatted translation string.
-So, this:
+Here we used ``locale`` attribute of :class:`h10n.core.Message` object to get
+access to parent locale.  Method ``__getitem__`` of :class:`h10n.core.Locale`
+returns catalog object.  Method ``__getitem__`` of :class:`h10n.core.Catalog`
+returns message.  Method ``format`` of message object returns formatted
+translation string.  So, this call in message filter:
 
 ..  code-block:: python
 
     self.locale['object']['article'].format()
 
-Is equal to:
+...performs same operations as this one:
 
 ..  code-block:: python
 

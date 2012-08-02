@@ -291,7 +291,9 @@ class HelperNamespace(Namespace):
     in its keys and helper specifications in its values.  The alias become
     helper name in the namespace.  The specification should be a Python path
     to the helper factory, similar to path using in the entry points from
-    ``pkg_resources``, i.e. ``python.path.to.helper.module:HelperFactory``.
+    `pkg_resources`_, i.e. ``python.path.to.helper.module:HelperFactory``.
+
+    .. _`pkg_resources`: http://packages.python.org/distribute/pkg_resources.html
 
     Each helper and locale pair is registered in the internal class-level
     registry.  This mean, that two different Helper Namespace objects with

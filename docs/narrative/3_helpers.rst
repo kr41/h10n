@@ -1,8 +1,8 @@
 Helpers
 =======
 
-It's time to resolve the problem with indefinite article forms from previous
-topic.  The code is very simple:
+It's time to resolve the problem with indefinite article forms from
+:ref:`the_problem` topic.  The code is very simple:
 
 ..  code-block:: python
 
@@ -18,14 +18,16 @@ this code reusable.
     :language: python
 
 Take a notice to ``__helper__`` key in ``message`` catalog.  It is not a message
-definition, it's a helper namespace one.  Helper namespace is provided as global
-value during filter compilation.  So, you can get access to it from filter using
-``helper`` identifier.
+definition, it's a :class:`h10n.core.HelperNamespace` one.  Helper namespace is
+provided as global value during filter compilation.  So, you can get access
+to it from filter using ``helper`` identifier.
 
 Keys of helper namespace definition dictionary become aliases of helpers.
 Values must be Python names of helper factories.  The format of entry point from
-``pkg_resources`` is used for these names, i.e. name is defined as
+`pkg_resources`_ is used for these names, i.e. name is defined as
 ``package.name:factory``.
+
+..  _`pkg_resources`: http://packages.python.org/distribute/pkg_resources.html
 
 Helper factory must be a callable, which accept two positional arguments:
 language and country.  The returned value of factory is used by helper namespace
