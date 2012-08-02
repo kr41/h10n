@@ -123,7 +123,7 @@ class Translator(object):
         ..  code-block:: pycon
 
             >>> t = Translator(name='t', locales={'en-US': {}})
-            >>> t == Translator.get_instance('t')
+            >>> t is Translator.get_instance('t')
             True
 
         """
@@ -275,8 +275,9 @@ class Message(object):
     :meth:`Translator.translate` method.
 
     The Message object will be translated implicitly on convert into
-    ``unicode`` or ``str``.  It also can be called to be translate explicitly.
-    Passed on call keyword arguments will override passed ones via constructor.
+    ``unicode`` or ``str``.  It also can be called to be translated explicitly.
+    Keyword arguments passed via ``__call__`` method will override passed ones
+    via constructor.
     """
 
     def __init__(self, translator, id, fallback, **params):
