@@ -2,7 +2,10 @@ Sources
 =======
 
 In previous topics we define messages directly in source code.  But in real
-application you will place it in separate files.  Let's see how to do it::
+application you will place it in separate files.  Let's see how to do it.
+
+Files listed below are available
+in the `examples directory <../_static/examples/5_sources/>`_::
 
     /                                       # Sample application root directory
         translations/                       # Translations directory
