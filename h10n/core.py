@@ -1,3 +1,8 @@
+"""
+A Core module contains objects which is used by h10n internally.  End users
+don't need to use this module directly.
+"""
+
 import re
 import pkg_resources
 from textwrap import dedent
@@ -35,7 +40,7 @@ class Locale(NamedObject):
         <Catalog: test>
         >>> l['test:message']
         <Message: message>
-        >>> l['test:message'] == l['test']['message']
+        >>> l['test:message'] is l['test']['message']
         True
 
     """
@@ -246,7 +251,7 @@ class Message(NamedObject, Namespace):
         """
         Format translation string according to passed parameters.
 
-        Formatting is performed in three steps:
+        Formatting is performed in following steps:
 
         1.  Merge passed parameters with default ones.
         2.  Pass parameters to ``filter``.
@@ -257,7 +262,7 @@ class Message(NamedObject, Namespace):
 
         Formatting ``key`` and ``msg`` (translation string) is performed using
         standard ``format`` method of ``str`` and ``unicode`` objects.
-        See `PEP 3101`_.
+        See `PEP 3101`_ for details.
 
         .. _`PEP 3101`: http://www.python.org/dev/peps/pep-3101/
         """
@@ -301,7 +306,7 @@ class HelperNamespace(Namespace):
         >>> h.pluralize                                  # doctest: +ELLIPSIS
         <h10n.helper.pluralize.Pluralize object at ...>
         >>> h2 = HelperNamespace(locale, helpers)
-        >>> h.pluralize == h2.pluralize
+        >>> h.pluralize is h2.pluralize
         True
     """
 

@@ -1,3 +1,9 @@
+"""
+An Utility module contains objects which is used by h10n internally.  End users
+don't need to use this module directly.
+"""
+
+
 class Namespace(object):
     """
     Namespace is an utility object, which mimics to JavaScript object.
