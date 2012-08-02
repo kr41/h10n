@@ -1,8 +1,10 @@
 H10n Documentation
 ==================
 
-"H10n" is a framework for internationalization and localization for
-Python_ programming language.  Abbreviation "h10n" means "Humanization".
+"H10n" means "Humanization".  It is a framework for internationalization and 
+localization for Python_ programming language.  The main goal is that 
+translation strings are full featured objects, so that you can encapsulate
+language specific things processing directly in the translation catalogs.
 
 .. _Python: http://www.python.org/
 

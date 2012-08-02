@@ -51,16 +51,18 @@ If you run this program, output will be::
     Comment has been successfully removed
 
 There are two interesting things.  Let's start from last one.  We don't added
-catalog ``message`` into Russian locale.  So, translator used English locale as 
-fallback one to translate wrong Russian messages.  It also logged debug 
-information, but it failed with message "No handlers could be found for logger 
-"h10n.translator", because we didn't configure logger.  We will do it later,
-on learning h10n debug process.
+catalog ``message`` into Russian locale.  So, translator used English (default) 
+locale as fallback one to translate wrong Russian messages.  It also logged 
+debug information, but it failed with message "No handlers could be found for 
+logger "h10n.translator", because we didn't configure logger.  We will do it 
+later, on learning h10n :ref:`debugging`.
 
 Most interesting thing is ``message:removed`` translation message, which is 
 defined using full form of definition.  The best way to show difference between 
 full and simple forms is to look on how message object is constructed.  If you 
-look into sources, you will see, that it's little bit more complex than this:
+look into sources of :class:`h10n.core.Catalog`, which constructs 
+:class:`h10n.core.Message` objects from definitions, you will see, that it's 
+little bit complex than this:
 
 ..  code-block:: python
     
@@ -68,13 +70,14 @@ look into sources, you will see, that it's little bit more complex than this:
         message = {'msg': message}
     message = Message(**message)
 
-A translation string provided via ``msg`` keyword argument.  Other keyword 
-argument is ``filter`` one.  Filter is just Python code with little ....... of 
+A translation string is provided via ``msg`` keyword argument.  Other keyword 
+argument is ``filter`` one.  Filter is just Python code with little pinch of 
 syntax sugar.  Filter makes all dirty work on translation.  How it work?
 Method ``translate`` of translator object accepts keyword arguments.  When it
-find specified message, it call message's method ``format`` passing these 
-arguments.  Method ``format`` process provided arguments using filter and
-calls ``format`` method of translation string ``msg``, using filtered arguments.
+find specified message, it call message's :meth:`h10n.core.Message.format` 
+method passing these arguments.  Method ``format`` process provided arguments 
+using filter and calls ``format`` method of translation string ``msg``,
+using filtered arguments.
 
 So, string::
     
@@ -89,9 +92,10 @@ keyword arguments as second one:
         kw['object'] = self.locale['object'][kw['object']].format()
 
 Here we used ``locale`` attribute of message object to get access to parent 
-locale.  Locale's method ``__getitem__`` returns catalog object.  Catalog's
-method ``__getitem__`` returns message.  Method ``format`` of message object
-returns formatted translation string.  So, this:
+locale.  Method ``__getitem__`` of :class:`h10n.core.Locale` returns catalog 
+object.  Method ``__getitem__`` of :class:`h10n.core.Catalog` returns message.  
+Method ``format`` of message object returns formatted translation string.  
+So, this:
 
 ..  code-block:: python
 
