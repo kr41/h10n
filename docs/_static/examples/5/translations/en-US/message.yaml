@@ -1,0 +1,16 @@
+# translations/en-US/message.yaml
+
+__helper__:
+    a: helpers:a
+
+
+removed:
+    filter: |
+        $object = self.locale['object'][$object].format()
+    msg: "{object} has been successfully removed"
+
+choose:
+    filter: |
+        $object = self.locale['object'][$object].format().lower()
+        $an = helper.a($object)
+    msg: "Please, choose {an} {object} for removal"

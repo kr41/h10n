@@ -1,0 +1,18 @@
+# translations/ru-RU/message.yaml
+
+removed:
+    filter: |
+        $object = self.locale['object'][$object]
+        $gender = $object.gender
+        $object = $object.format()
+    key: "{gender}"
+    msg:
+        m: "{object} успешно удален"
+        f: "{object} успешно удалена"
+        n: "{object} успешно удалено"
+
+choose:
+    filter: |
+        $object = self.locale['object'][$object] \
+                      .format(case='a').lower()
+    msg: "Выберете {object} для удаления"

@@ -5,7 +5,7 @@ There are two global variable in the module: ``file_sources`` and ``scanners``.
 
 The ``file_sources`` variable is used by :func:`scan_path` to determine
 supported file types.  It is a dictionary, which contain file extensions
-(with by dot char) in its keys and file source factories in its values.
+(prefixed by dot char) in its keys and file source factories in its values.
 This dictionary is filled on import time using entry points from
 ``h10n.source.file`` group.  The entry point name is used as file extension.
 

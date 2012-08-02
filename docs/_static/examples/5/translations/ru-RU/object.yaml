@@ -1,0 +1,15 @@
+# translations/ru-RU/object.yaml
+
+article:
+    prototype: proto:noun
+    msg:
+        n: Статья
+        a: Статью
+    gender: f
+
+comment:
+    prototype: proto:noun
+    msg:
+        n: Комментарий
+        a: Комментарий
+    gender: m

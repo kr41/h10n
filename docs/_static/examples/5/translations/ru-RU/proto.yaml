@@ -1,0 +1,6 @@
+# translations/ru-RU/proto.yaml
+
+noun:
+    defaults:
+        case: n
+    key: "{case}"

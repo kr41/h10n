@@ -1,8 +1,8 @@
 H10n Documentation
 ==================
 
-"H10n" means "Humanization".  It is a framework for internationalization and 
-localization for Python_ programming language.  The main goal is that 
+"H10n" means "Humanization".  It is a framework for internationalization and
+localization for Python_ programming language.  The main goal is that
 translation strings are full featured objects, so that you can encapsulate
 language specific things processing directly in the translation catalogs.
 
@@ -14,12 +14,13 @@ Narrative
 ..  toctree::
     :maxdepth: 2
 
-    narrative/the_problem
-    narrative/basic_translation
-    narrative/filters
-    narrative/helpers
-    narrative/prototypes
-    narrative/debugging
+    narrative/0_the_problem
+    narrative/1_basic_translation
+    narrative/2_filters
+    narrative/3_helpers
+    narrative/4_prototypes
+    narrative/5_sources
+    narrative/6_debugging
 
 API References
 --------------
