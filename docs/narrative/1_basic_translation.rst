@@ -4,7 +4,7 @@ Basic Translation
 Let's try to create a translation for our imaginable CMS from previous topic.
 First of all we need to create translatable object types.
 
-..  literalinclude:: ../_static/examples/1/app_1.py
+..  literalinclude:: ../_static/examples/1_basic_translation/app_1.py
     :language: python
 
 At the moment, our application is something like traditional "Hello world" one.
@@ -25,7 +25,7 @@ Just because we use single locale it implicitly became default and we don't
 need to provide it explicitly before translation.  But if we add another locale,
 we should do it.  So, let's add Russian locale.
 
-..  literalinclude:: ../_static/examples/1/app_2.py
+..  literalinclude:: ../_static/examples/1_basic_translation/app_2.py
     :language: python
 
 Here, we added Russian locale, which is copy of English one.  Also, we defined

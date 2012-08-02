@@ -3,7 +3,7 @@ Prototypes
 
 Let's add ``message:choose`` to Russian locale.
 
-..  literalinclude:: ../_static/examples/4/app_1.py
+..  literalinclude:: ../_static/examples/4_prototypes/app_1.py
     :language: python
 
 
@@ -15,5 +15,5 @@ copy-paste work to add ``defaults`` and ``key`` parameters to each noun
 in Russian locale.  Let's use prototype instead.
 
 
-..  literalinclude:: ../_static/examples/4/app_2.py
+..  literalinclude:: ../_static/examples/4_prototypes/app_2.py
     :language: python

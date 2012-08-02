@@ -3,7 +3,7 @@ Filters
 
 Let's go ahead and add to our application message template.
 
-..  literalinclude:: ../_static/examples/2/app_1.py
+..  literalinclude:: ../_static/examples/2_filters/app_1.py
     :language: python
 
 There are two interesting things.  Let's start from last one.  We don't added
@@ -70,7 +70,7 @@ English.  We can't simply substitute object name into translation string of
 to noun's gender, which represent object name.  There are three noun's gender in
 Russian: masculine, feminine and neuter.
 
-..  literalinclude:: ../_static/examples/2/app_2.py
+..  literalinclude:: ../_static/examples/2_filters/app_2.py
     :language: python
 
 Here we added ``gender`` attribute to the messages from ``object`` catalog, and

@@ -14,7 +14,7 @@ topic.  The code is very simple:
 So, you can include it directly in your filter, but it will be better to make
 this code reusable.
 
-..  literalinclude:: ../_static/examples/3/app.py
+..  literalinclude:: ../_static/examples/3_helpers/app.py
     :language: python
 
 Take a notice to ``__helper__`` key in ``message`` catalog.  It is not a message
