@@ -1,7 +1,7 @@
 Helpers
 =======
 
-It's time to resolve the problem with indefinite article forms from previous 
+It's time to resolve the problem with indefinite article forms from previous
 topic.  The code is very simple:
 
 ..  code-block:: python
@@ -11,7 +11,7 @@ topic.  The code is very simple:
             return 'an'
         return 'a'
 
-So, you can include it directly in your filter, but it will be better to make 
+So, you can include it directly in your filter, but it will be better to make
 this code reusable.
 
 ..  code-block:: python
@@ -94,16 +94,16 @@ this code reusable.
     print t.translate('message:choose', 'Choose an object', object='comment')
 
 Take a notice to ``__helper__`` key in ``message`` catalog.  It is not a message
-definition, it's a helper namespace one.  Helper namespace is provided as global 
-value during filter compilation.  So, you can get access to it from filter using 
+definition, it's a helper namespace one.  Helper namespace is provided as global
+value during filter compilation.  So, you can get access to it from filter using
 ``helper`` identifier.
 
-Keys of helper namespace definition dictionary become aliases of helpers.  
+Keys of helper namespace definition dictionary become aliases of helpers.
 Values must be Python names of helper factories.  The format of entry point from
-``pkg_resources`` is used for these names, i.e. name is defined as 
+``pkg_resources`` is used for these names, i.e. name is defined as
 ``package.name:factory``.
 
-Helper factory must be a callable, which accept two positional arguments: 
+Helper factory must be a callable, which accept two positional arguments:
 language and country.  The returned value of factory is used by helper namespace
 as helper.  There are no requirements of how to use passed arguments or which
 value to return.
