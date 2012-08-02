@@ -37,6 +37,7 @@ API References
 Indices and tables
 ------------------
 
+* :ref:`glossary`
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
