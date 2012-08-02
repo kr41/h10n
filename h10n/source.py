@@ -8,12 +8,32 @@ supported file types.  It is a dictionary, which contain file extensions
 (prefixed by dot char) in its keys and file source factories in its values.
 This dictionary is filled on import time using entry points from
 ``h10n.source.file`` group.  The entry point name is used as file extension.
+h10n support only YAML-files out of the box, but you can add another ones using
+entry points.
+
+..  code-block:: pycon
+
+    >>> file_sources['.yaml']
+    <class 'h10n.source.YAMLSource'>
+    >>> file_sources['.yaml'] is file_sources['.yml']
+    True
+
 
 The ``scanners`` variable is used by :func:`scanner` function to determine
 supported types of scanners.  It is a dictionary, which contain protocol name
 of scanner in its keys, and scanners in its values.  This dictionary is filled
 on import time using entry points from ``h10n.scanner`` group.  The entry point
 name is used as protocol name.
+
+..  code-block:: pycon
+
+    >>> scanners['path']                                # doctest: +ELLIPSIS
+    <function scan_path at ...>
+    >>> scanners['asset']                               # doctest: +ELLIPSIS
+    <function scan_asset at ...>
+    >>> scanners['py']                                  # doctest: +ELLIPSIS
+    <function scan_py at ...>
+
 """
 
 import os
@@ -47,12 +67,12 @@ def scanner(uri_list):
     URI's protocol is used to determine how to scan particular URI.  It must be
     a key from the ``scanners`` dictionary from this module.  For example,
     URI ``asset://myapp.resources:translations`` will be scanned
-    by :func:``asset_scanner``.
+    by :func:`scan_asset`.
     """
     for uri in uri_list:
-        protocol, id = uri.split('://')
+        protocol, spec = uri.split('://')
         try:
-            yield scanners[protocol](id)
+            yield scanners[protocol](spec)
         except KeyError:
             raise ValueError('Unknown scanner "{0}"'.format(protocol))
 
