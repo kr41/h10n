@@ -7,7 +7,15 @@ setup(
     version=version,
     description="",
     long_description="""""",
-    classifiers=[], # Get strings from http://pypi.python.org/pypi?%3Aaction=list_classifiers
+    classifiers=[
+        "Programming Language :: Python",
+        "Programming Language :: Python :: 2.6",
+        "Programming Language :: Python :: 2.7",
+        "Topic :: Software Development :: Internationalization",
+        "Topic :: Software Development :: Localization",
+        "Operating System :: OS Independent",
+        "License :: OSI Approved :: BSD License",
+    ],
     keywords='',
     author='Dmitry Vakhrushev',
     author_email='self@kr41.net',
@@ -17,13 +25,13 @@ setup(
     zip_safe=False,
     test_suite='nose.collector',
     install_requires=[],
-    entry_points = """\
-    [h10n.scanner]
-    path = h10n.source:scan_path
-    asset = h10n.source:scan_asset
-    py = h10n.source:scan_py
-    [h10n.source.file]
-    .yaml = h10n.source:YAMLSource
-    .yml = h10n.source:YAMLSource
+    entry_points="""\
+        [h10n.scanner]
+        path = h10n.source:scan_path
+        asset = h10n.source:scan_asset
+        py = h10n.source:scan_py
+        [h10n.source.file]
+        .yaml = h10n.source:YAMLSource
+        .yml = h10n.source:YAMLSource
     """,
 )
