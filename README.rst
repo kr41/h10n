@@ -5,7 +5,7 @@ h10n
 that helps to build flexible & well supportable multilingual applications
 by "smart" translation strings.
 
-Read the `documentation <http://h10n.readthedocs.org/en/latest/index.html_>`
+Read the `documentation <http://h10n.readthedocs.org/en/latest/index.html>`_.
 for more details.
 
-Source code is on `Google Code <http://code.google.com/p/h10n/>`.
+Source code is on `Google Code <http://code.google.com/p/h10n/>`_.
