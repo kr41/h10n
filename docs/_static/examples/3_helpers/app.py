@@ -8,7 +8,7 @@ def a(lang, country):
         raise ValueError('Unsupported language "{0}"'.format(lang))
 
     def helper_a(word):
-        if word[0].lower() in ('a', 'o', 'i', 'e'):
+        if word[0].lower() in ('a', 'e', 'i', 'o', 'u'):
             return 'an'
         return 'a'
     return helper_a

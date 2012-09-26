@@ -7,12 +7,12 @@ Let's go ahead and add to our application message template.
     :language: python
 
 There are two interesting things.  Let's start from last one.  We don't added
-catalog ``message`` into Russian locale.  So, translator used English (default)
-locale as fallback one to translate wrong Russian messages.  It also logged
-debug information, but it failed with message "No handlers could be found for
-logger "h10n.translator" (this message will be fired to ``stderr`` if you run
-this program), because we didn't configure logger.  We will do it later,
-on learning h10n :ref:`debugging`.
+:term:`catalog` ``message`` into Russian :term:`locale`.  So, :term:`translator`
+used English (default) locale as fallback one to translate wrong Russian
+:term:`messages<message>`.  It also logged debug information, but it failed with
+message "No handlers could be found for logger "h10n.translator" (this message
+will be fired to ``stderr`` if you run this program), because we didn't configure
+logger.  We will do it later, on learning h10n :ref:`debugging`.
 
 Most interesting thing is ``message:removed`` translation message, which is
 defined using full form of definition.  The best way to show difference between
@@ -28,8 +28,8 @@ little bit complex than this:
     message = Message(**message)
 
 A translation string is provided via ``msg`` keyword argument.  Other keyword
-argument is ``filter`` one.  Filter is just Python code with little pinch of
-syntax sugar.  Filter makes all dirty work on translation.  How it work?
+argument is ``filter`` one.  :term:`Filter` is just Python code with little
+pinch of syntax sugar.  Filter makes all dirty work on translation.  How it work?
 Method ``translate`` of translator object accepts keyword arguments.  When it
 find specified message, it call message's :meth:`h10n.core.Message.format`
 method passing these arguments.  Method ``format`` process provided arguments

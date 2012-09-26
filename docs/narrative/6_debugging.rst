@@ -4,9 +4,11 @@ Debugging
 =========
 
 The main idea of h10n is broken translation can't break application.  This means
-that any exception, occurred during translation is swallowed by Translator.
-Translator use standard ``logging`` package to log debug info.  So, let's run
+that any exception, occurred during translation is swallowed by :term:`Translator`.
+Translator use standard logging_ package to log debug info.  So, let's run
 following code:
+
+..  _logging: http://docs.python.org/library/logging.html
 
 ..  literalinclude:: ../_static/examples/6_debugging/app.py
     :language: python
@@ -38,10 +40,10 @@ tracebacks.  The most interesting thing is a second argument of exception.
 It is an instance of :class:`h10n.util.ExceptionContext`, which stores
 "breadcrumbs" to the problem.
 
-First exception raised from ``ru-RU`` locale, because it doesn't contain
-``test`` catalog.  Second one raised from ``en-GB:test`` catalog, because it
-doesn't contain ``error`` message.  Third one raised from filter of message
-``en-US:test:error``.
+First exception raised from ``ru-RU`` :term:`locale`, because it doesn't contain
+``test`` :term:`catalog`.  Second one raised from ``en-GB:test`` catalog, because
+it doesn't contain ``error`` :term:`message`.  Third one raised from
+:term:`filter` of message ``en-US:test:error``.
 
 Take a notice to fallback order.  After fail in ``ru-RU`` locale Translator used
 ``en-GB`` one, because it specified in ``fallback`` parameter of Translator

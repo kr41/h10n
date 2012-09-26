@@ -42,5 +42,5 @@ in the `examples directory <../_static/examples/5_sources/>`_::
     :language: python
 
 
-Take a notice to ``scan`` parameter passed to Translator.  It replaced
+Take a notice to ``scan`` parameter passed to :term:`Translator`.  It replaced
 ``locales`` one.  See :mod:`h10n.source` module doc-strings for details.

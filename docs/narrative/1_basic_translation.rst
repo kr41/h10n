@@ -9,23 +9,22 @@ First of all we need to create translatable object types.
 
 At the moment, our application is something like traditional "Hello world" one.
 Firstly we defined available locales as tree of nested dictionaries.  First
-level dictionary keys becomes locale names, second level ones -- catalog names,
-third level ones -- message names.  Yes, h10n is able to store translation
-catalogs in files, and not only in files.  But for our example will be more
-useful to define all directly in source code.
+level dictionary keys becomes :term:`locale` names, second level ones --
+:term:`catalog` names, third level ones -- :term:`message` names.  Yes, h10n is
+able to store translation catalogs in files, and not only in files.  But for our
+example will be more useful to define all directly in source code.
 
-Than we created a Translator.  See :class:`h10n.translator.Translator` for
-details.
+Than we created a :term:`Translator`.  See :class:`h10n.translator.Translator`
+class for details.
 
-And finally, we translated messages ``article`` and ``comment`` from
-catalog ``object``.  First argument
-of :meth:`h10n.translator.Translator.translate` method is message full
-name, i.e. catalog name and message name separated by colon. Second one is
-fallback message, which should be used by translator on fail.
+And finally, we translated messages ``article`` and ``comment`` from catalog
+``object``.  First argument of :meth:`h10n.translator.Translator.translate`
+method is message full name, i.e. catalog name and message name separated by
+colon. Second one is fallback message, which should be used by translator on fail.
 
-Just because we use single locale it implicitly became default and we don't
-need to provide it explicitly before translation.  But if we add another locale,
-we should do it.  So, let's add Russian locale.
+Just because we use single locale it implicitly became default and we
+don't need to provide it explicitly before translation.  But if we add another
+locale, we should do it.  So, let's add Russian one.
 
 ..  literalinclude:: ../_static/examples/1_basic_translation/app_2.py
     :language: python

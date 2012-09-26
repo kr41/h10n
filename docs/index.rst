@@ -1,10 +1,12 @@
-H10n Documentation
+h10n Documentation
 ==================
 
-"H10n" means "Humanization".  It is a framework for internationalization and
-localization for Python_ programming language.  The main goal is that
-translation strings are full featured objects, so that you can encapsulate
-language specific things processing directly in the translation catalogs.
+"Humanization" is a Python_ framework for localization & internationalization
+that helps to build flexible & well supportable multilingual applications
+by "smart" translation strings.
+
+The main goal is that translation strings are full featured objects, so that
+you can encapsulate things specific for natural language directly in ones.
 
 .. _Python: http://www.python.org/
 
@@ -41,3 +43,11 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
+
+
+.. hidden toc to avoid warnings
+
+.. toctree::
+   :hidden:
+
+   glossary

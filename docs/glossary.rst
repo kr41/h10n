@@ -9,7 +9,7 @@ Glossary
     translator
         Translator is an object to manage :term:`locales<locale>` and perform
         :term:`message` translation.
-        See the :class:`h10n.translator.Translator` class for details.
+        Is represented by :class:`h10n.translator.Translator` class.
 
     locale
         Locale is an object which stores :term:`messages<message>` and
@@ -17,6 +17,7 @@ Glossary
         uniquely identified by its name -- the string in format ``xx-YY``,
         where ``xx`` is language identifier and ``YY`` is country one.  Note,
         locale name is **case-sensitive**.
+        Is represented by :class:`h10n.core.Locale` class.
 
     catalog
         Translation catalog or domain is a logical group
@@ -26,9 +27,12 @@ Glossary
         :term:`helpers<helper>`.
 
     message
-        Message is a string, which should be translated into different
-        :term:`locales<locale>`.  Messages are instanced from class
-        :class:`h10n.core.Message` and stored in the :term:`catalogs<catalog>`.
+        Message is a translation string object.  Messages are instanced from
+        class :class:`h10n.core.Message` and stored in the :term:`catalogs<catalog>`.
+
+    prototype
+        Prototype is a :term:`message` object, which is used by other ones to
+        inherit from it.
 
     filter
         Is a Python callable object, which transforms input parameters before
