@@ -16,7 +16,7 @@ setup(
     include_package_data=True,
     zip_safe=False,
     test_suite='nose.collector',
-    install_requires=['pyyaml'],
+    install_requires=[],
     entry_points = """\
     [h10n.scanner]
     path = h10n.source:scan_path
