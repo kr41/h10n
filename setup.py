@@ -1,12 +1,17 @@
+import os
 from setuptools import setup, find_packages
 
-version = '0.1dev'
+version = '0.1b1'
+here = os.path.abspath(os.path.dirname(__file__))
+README = open(os.path.join(here, 'README.rst')).read()
+CHANGES = open(os.path.join(here, 'CHANGES.rst')).read()
 
 setup(
     name='h10n',
     version=version,
-    description="",
-    long_description="""""",
+    description='Humanization is a Python framework ' \
+                'for localization & internationalization',
+    long_description=README + '\n\n' + CHANGES,
     classifiers=[
         "Programming Language :: Python",
         "Programming Language :: Python :: 2.6",
