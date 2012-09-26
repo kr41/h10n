@@ -24,10 +24,10 @@ setup(
     keywords='',
     author='Dmitry Vakhrushev',
     author_email='self@kr41.net',
-    url='',
+    url='http://code.google.com/p/h10n/',
     packages=find_packages(exclude=['ez_setup', 'examples', 'tests']),
     include_package_data=True,
-    zip_safe=False,
+    zip_safe=True,
     test_suite='nose.collector',
     install_requires=['pyyaml'],
     entry_points="""\
