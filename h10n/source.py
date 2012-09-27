@@ -41,10 +41,6 @@ import re
 import pkg_resources
 import yaml
 import logging
-try:
-    from yaml import CLoader as YAMLLoader
-except ImportError:
-    from yaml import YAMLLoader
 
 
 logger = logging.getLogger(__name__)
@@ -54,7 +50,7 @@ class YAMLSource(dict):
     """ A message source, which extracts message definitions from YAML-files """
     def __init__(self, path):
         with open(path) as f:
-            self.update(yaml.load(f, Loader=YAMLLoader))
+            self.update(yaml.load(f))
 
 
 def scanner(uri_list):

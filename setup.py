@@ -9,8 +9,7 @@ CHANGES = open(os.path.join(here, 'CHANGES.rst')).read()
 setup(
     name='h10n',
     version=version,
-    description='Humanization is a Python framework ' \
-                'for localization & internationalization',
+    description='Humanization: i18n & l10n framework',
     long_description=README + '\n\n' + CHANGES,
     classifiers=[
         "Programming Language :: Python",
