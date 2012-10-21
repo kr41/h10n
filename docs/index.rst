@@ -8,7 +8,10 @@ by "smart" translation strings.
 The main goal is that translation strings are full featured objects, so that
 you can encapsulate things specific for natural language directly in ones.
 
-.. _Python: http://www.python.org/
+Contributors are welcome on Bitbucket_.
+
+..  _Python: http://www.python.org/
+..  _Bitbucket: https://bitbucket.org/kr41/h10n/
 
 Narrative
 ---------
@@ -45,9 +48,9 @@ Indices and tables
 * :ref:`search`
 
 
-.. hidden toc to avoid warnings
+..  hidden toc to avoid warnings
 
-.. toctree::
-   :hidden:
+..  toctree::
+    :hidden:
 
-   glossary
+    glossary
