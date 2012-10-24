@@ -38,7 +38,7 @@ def context_test():
     context = None
     try:
         container.test_context()
-    except Exception, e:
+    except Exception as e:
         context = e.args[-1]
     tools.eq_(repr(context), '<ExceptionContext: [<Container: 1>, <Item: 1>]>')
 
@@ -48,6 +48,6 @@ def duplicate_test():
     context = None
     try:
         container.test_duplicate()
-    except Exception, e:
+    except Exception as e:
         context = e.args[-1]
     tools.eq_(repr(context), '<ExceptionContext: [<Container: 1>]>')

@@ -10,6 +10,7 @@ from threading import RLock
 
 from h10n.util import keep_context
 from h10n.util import NamedObject, Namespace
+from h10n.compat import strtypes
 
 
 class Locale(NamedObject):
@@ -35,7 +36,7 @@ class Locale(NamedObject):
 
     ..  code-block:: pycon
 
-        >>> l = Locale('en-US', None, {'test': {'message': u'Message'}})
+        >>> l = Locale('en-US', None, {'test': {'message': 'Message'}})
         >>> l['test']
         <Catalog: test>
         >>> l['test:message']
@@ -51,7 +52,7 @@ class Locale(NamedObject):
         self.translator = translator
         self.lang, self.country = name.split('-')
         self.catalogs = {}
-        for catalog_name, catalog in catalogs.iteritems():
+        for catalog_name, catalog in catalogs.items():
             self.catalogs[catalog_name] = Catalog(catalog_name, self, catalog)
 
     @keep_context
@@ -134,7 +135,7 @@ class Catalog(NamedObject):
         message = self.source[name]
         if not isinstance(message, Message):
             with self._mutex:
-                if isinstance(message, basestring):
+                if isinstance(message, strtypes):
                     message = {'msg': message}
                 else:
                     message = message.copy()
@@ -199,13 +200,13 @@ class Message(NamedObject, Namespace):
         ...                     defaults={'count': 1},
         ...                     filter='$form = helper.pluralize($count)',
         ...                     helper=helper)
-        >>> message = Message(msg={'0': u'{count} item',
-        ...                        '1': u'{count} items'},
+        >>> message = Message(msg={'0': '{count} item',
+        ...                        '1': '{count} items'},
         ...                   prototype=prototype)
         >>> message.format()
-        u'1 item'
+        '1 item'
         >>> message.format(count=3)
-        u'3 items'
+        '3 items'
 
     """
 
@@ -244,7 +245,7 @@ class Message(NamedObject, Namespace):
             filter = filter.split('\n')
             filter.insert(0, 'def filter(self, kw):')
             filter = '\n    '.join(filter)
-            exec filter in {'self': self, 'helper': helper}, self.__dict__
+            exec(filter, {'self': self, 'helper': helper}, self.__dict__)
 
     @keep_context
     def format(self, **kw):
@@ -317,7 +318,7 @@ class HelperNamespace(Namespace):
     def __init__(self, locale, helpers):
         properties = {}
         cls = self.__class__
-        for alias, helper in helpers.iteritems():
+        for alias, helper in helpers.items():
             if (locale.name, helper) not in cls._registry:
                 entry_point = 'x={0}'.format(helper)
                 entry_point = pkg_resources.EntryPoint.parse(entry_point)

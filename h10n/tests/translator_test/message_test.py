@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
+import sys
 from nose import tools
 
 from h10n.translator import Translator, Message
+from h10n.compat import u, unicode
 
 
 def setup():
@@ -15,7 +17,7 @@ def setup():
             },
             'ru-RU': {
                 'test': {
-                    'message':  u'Сообщение',
+                    'message':  u('Сообщение'),
                 }
             }
         },
@@ -32,7 +34,7 @@ def instance_via_translator_test():
     tools.eq_(unicode(message), 'Message')
 
     translator.locale = 'ru-RU'
-    tools.eq_(unicode(message), u'Сообщение')
+    tools.eq_(unicode(message), u('Сообщение'))
 
 
 def direct_instance_test():
@@ -46,5 +48,5 @@ def direct_instance_test():
     tools.eq_(unicode(message_2), 'Message')
 
     translator.locale = 'ru-RU'
-    tools.eq_(unicode(message_1), u'Сообщение')
-    tools.eq_(unicode(message_2), u'Сообщение')
+    tools.eq_(unicode(message_1), u('Сообщение'))
+    tools.eq_(unicode(message_2), u('Сообщение'))

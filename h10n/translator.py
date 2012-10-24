@@ -3,6 +3,7 @@ import re
 
 from h10n.core import Locale, HelperNamespace
 from h10n.source import scanner
+from h10n.compat import *
 
 
 logger = logging.getLogger(__name__)
@@ -88,9 +89,9 @@ class Translator(object):
         scan = _list(scan)
         use_only = _list(use_only)
         for source in scanner(scan):
-            for name, catalogs in source.iteritems():
+            for name, catalogs in source.items():
                 locale = locales.setdefault(name, {})
-                for catalog_name, catalog_properties in catalogs.iteritems():
+                for catalog_name, catalog_properties in catalogs.items():
                     if catalog_name in locale:
                         logger.warning('Overriding catalog %s:%s',
                                        name, catalog_name)
@@ -98,7 +99,7 @@ class Translator(object):
         self.locales = {}
         self.lang_map = lang_map or {}
         self.country_map = country_map or {}
-        for name, catalogs in locales.iteritems():
+        for name, catalogs in locales.items():
             if use_only and name not in use_only:
                 continue
             locale = Locale(name, self, catalogs)
@@ -108,9 +109,9 @@ class Translator(object):
             if country_map is None or locale.country not in country_map:
                 self.country_map[locale.country] = name
         if self.default is None:
-            self.default = self.locales.keys()[0]
+            self.default = list(self.locales.keys())[0]
         if helpers:
-            for locale in self.locales.itervalues():
+            for locale in self.locales.values():
                 locale.helper = HelperNamespace(locale, helpers)
 
     def __repr__(self):
@@ -150,7 +151,7 @@ class Translator(object):
             >>> Translator(locales={
             ...    'en-US': {
             ...        'test.catalog': {
-            ...            'msg': u'Message'
+            ...            'msg': 'Message'
             ...        }
             ...    }
             ... })
@@ -158,7 +159,7 @@ class Translator(object):
 
             >>> # ...is equal to:
             >>> Translator.from_config({
-            ...     'h10n.locales.en-US.[test.catalog].msg':  u'Message'
+            ...     'h10n.locales.en-US.[test.catalog].msg':  'Message'
             ... })
             Translator(None)
 
@@ -169,7 +170,7 @@ class Translator(object):
         config_tree = {}
         prefix_len = len(prefix)
         dotted_name = re.compile('\[([\.\w\_]+)\]', re.I)
-        for key, value in config.iteritems():
+        for key, value in config.items():
             if key == name_key:
                 continue
             if key.startswith(prefix):
@@ -281,7 +282,7 @@ class Message(object):
     """
 
     def __init__(self, translator, id, fallback, **params):
-        if isinstance(translator, basestring):
+        if isinstance(translator, strtypes):
             translator = Translator.get_instance(translator)
         self.translator = translator
         self.id = id
@@ -300,11 +301,17 @@ class Message(object):
     def __repr__(self):
         return '<Message: {0}>'.format(self.id)
 
-    def __unicode__(self):
-        return self.translator.translate(self.id, self.fallback, **self.params)
+    if version == 2:
+        def __unicode__(self):
+            return self.translator.translate(self.id, self.fallback,
+                                             **self.params)
 
-    def __str__(self):
-        return unicode(self).encode(self.translator.encoding)
+        def __str__(self):
+            return unicode(self).encode(self.translator.encoding)
+    else:
+        def __str__(self):
+            return self.translator.translate(self.id, self.fallback,
+                                             **self.params)
 
     def __mod__(self, right):
         return unicode(self) % right
@@ -316,6 +323,6 @@ class _simple_storage(object): pass
 def _list(value):
     if value is None:
         value = []
-    if isinstance(value, basestring):
+    if isinstance(value, strtypes):
         value = [item.strip() for item in value.split(',')]
     return value

@@ -54,7 +54,7 @@ class Namespace(object):
             5
 
         """
-        for name, value in d.iteritems():
+        for name, value in d.items():
             if name.startswith('_') or name in self._frozen:
                 continue
             self[name] = value
@@ -100,10 +100,10 @@ class Namespace(object):
         except KeyError:
             return default
 
-    def iteritems(self):
-        for name, value in self.__dict__.iteritems():
+    def items(self):
+        for name, value in self.__dict__.items():
             if isinstance(value, Namespace):
-                for subname, subvalue in value.iteritems():
+                for subname, subvalue in value.items():
                     yield '{0}.{1}'.format(name, subname), subvalue
             else:
                 yield name, value
@@ -180,7 +180,7 @@ def keep_context(method):
     def context_keeper(self, *args, **kwargs):
         try:
             return method(self, *args, **kwargs)
-        except Exception, e:
+        except Exception as e:
             ExceptionContext.extend(e, self)
     context_keeper.__name__ = method.__name__
     context_keeper.__doc__ = method.__doc__
