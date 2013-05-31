@@ -2,6 +2,7 @@ from nose import tools
 
 from h10n.util import Namespace
 
+
 def regular_extend_test():
     """ h10n.util.Namespace: regular extend """
     obj = Namespace()
@@ -15,11 +16,13 @@ def regular_extend_test():
     tools.eq_(obj.b.c, 2)
     tools.eq_(obj.b.d, 3)
 
+
 @tools.raises(AttributeError)
 def invalid_extend_test():
     """ h10n.util.Namespace: invalid extend """
     obj = Namespace().extend({'_a': 1})
     obj._a
+
 
 def freeze_test():
     """ h10n.util.Namespace: frozen properties """
@@ -27,6 +30,7 @@ def freeze_test():
     obj.freeze()
     obj.extend({'a': 2})
     tools.eq_(obj.a, 1)
+
 
 def getter_test():
     """ h10n.util.Namespace: using getter """
@@ -46,6 +50,7 @@ def getter_test():
     tools.eq_(obj.get('b').get('d'), None)
     tools.eq_(obj.get('b').get('d', obj_2), obj_2)
 
+
 def strict_getter_test():
     """ h10n.util.Namespace: using strict getter """
     obj_1 = object()
@@ -54,6 +59,7 @@ def strict_getter_test():
     tools.eq_(obj['a'], obj_1)
     tools.eq_(obj['b.c'], obj_2)
     tools.eq_(obj['b']['c'], obj_2)
+
 
 @tools.raises(KeyError)
 def strict_getter_exception_test():

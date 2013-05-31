@@ -4,6 +4,7 @@ from nose import tools
 from h10n.source import scanner, scan_py, scan_path, scan_asset
 from h10n.source import YAMLSource
 
+
 path = os.path.join(os.path.dirname(__file__), 'assets')
 locales = {
     'en-US': {
@@ -18,6 +19,7 @@ locales = {
     }
 }
 
+
 def scan_py_test():
     """ h10n.source.scan_py: scan python modules """
     # Implicit form
@@ -27,15 +29,18 @@ def scan_py_test():
     result = scan_py('h10n.tests.source_test.scanner_test:locales')
     tools.eq_(result, locales)
 
+
 def scan_path_test():
     """ h10n.source.scan_path: scan path in filesystem """
     result = scan_path(path)
     tools.eq_(result, locales)
 
+
 def scan_asset_test():
     """ h10n.source.scan_asset: scan python package assets """
     result = scan_asset('h10n.tests.source_test:assets')
     tools.eq_(result, locales)
+
 
 def scanner_test():
     """ h10n.source.scanner: complex scan """

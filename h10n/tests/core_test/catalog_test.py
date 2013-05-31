@@ -21,17 +21,21 @@ def compile_message_test():
     tools.eq_(catalog['from_prototype'].format(), 'Prototype')
     tools.eq_(catalog['from_prototype'].prototype, prototype)
 
+
 def custom_source_test():
     """ h10n.core.Catalog: using source factory """
     class SourceFactory(dict):
         log = []
+
         def __getitem__(self, key):
             result = dict.__getitem__(self, key)
             self.log.append('get {0}'.format(key))
             return result
+
         def __setitem__(self, key, value):
             self.log.append('set {0}: {1}'.format(key, type(value)))
             return dict.__setitem__(self, key, value)
+
     catalog = Catalog('Test', None, {
         'factory': SourceFactory,
         'msg': 'Message',
@@ -40,12 +44,17 @@ def custom_source_test():
     tools.eq_(SourceFactory.log, ['get msg',
                                   "set msg: <class 'h10n.core.Message'>"])
 
+
 def factory_keyword_test():
     """ h10n.core.Catalog: using factory keyword """
     catalog = Catalog('Test', None, {
         'factory': 'Is not callable == Regular message',
     })
-    tools.eq_(catalog['factory'].format(), 'Is not callable == Regular message')
+    tools.eq_(
+        catalog['factory'].format(),
+        'Is not callable == Regular message'
+    )
+
 
 def helper_test():
     """ h10n.core.Catalog: using helpers """

@@ -3,7 +3,7 @@ import re
 
 from h10n.core import Locale, HelperNamespace
 from h10n.source import scanner
-from h10n.compat import *
+from h10n.compat import version, strtypes, unicode
 
 
 logger = logging.getLogger(__name__)
@@ -13,9 +13,9 @@ class Translator(object):
     """
     A Translator object is used to manage locales and perform translation.
 
-    The Translator accepts a number of keyword arguments: ``name``, ``default``,
-    ``locales``, ``use_only``, ``lang_map``, ``country_map``, ``fallback``,
-    ``strategy``, ``scan`` and ``helpers``.
+    The Translator accepts a number of keyword arguments: ``name``,
+    ``default``, ``locales``, ``use_only``, ``lang_map``, ``country_map``,
+    ``fallback``, ``strategy``, ``scan`` and ``helpers``.
 
     If the ``name`` argument is passed as non-``None`` value, current instance
     of translator will be registered in the internal class-level registry.
@@ -45,7 +45,8 @@ class Translator(object):
     For example, ``en-US`` and ``en-GB``.
 
     The ``country_map`` argument means the same thing as ``lang_map``,
-    but is used to resolve locale via country name, i.e. :attr:`country` property.
+    but is used to resolve locale via country name, i.e. :attr:`country`
+    property.
 
     The ``fallback`` argument, if passed, should be a dictionary object,
     which store locale names in its keys and values.  Is used to resolve
@@ -236,8 +237,8 @@ class Translator(object):
         A ``fallback`` argument should be a string, which will be used as
         result of failed translation.
 
-        A ``locale`` argument, if passed as non-``None`` value, should be a name
-        of locale, which override current one on translation time.
+        A ``locale`` argument, if passed as non-``None`` value, should be a
+        name of locale, which override current one on translation time.
 
         Other keyword arguments will be passed directly to
         :meth:`h10n.core.Message.format` method.
@@ -261,8 +262,8 @@ class Translator(object):
 
     def message(self, id, fallback=None, **params):
         """
-        Factory for lazy translatable messages.  Creates :class:`Message` object
-        using ``self`` as ``translator`` argument.
+        Factory for lazy translatable messages.  Creates :class:`Message`
+        object using ``self`` as ``translator`` argument.
         """
         return Message(self, id, fallback, **params)
 
@@ -318,7 +319,11 @@ class Message(object):
 
 
 from threading import local as _thread_local_storage
-class _simple_storage(object): pass
+
+
+class _simple_storage(object):
+    """ An utility class """
+
 
 def _list(value):
     if value is None:

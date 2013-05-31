@@ -62,7 +62,8 @@ class Namespace(object):
 
     def freeze(self):
         """
-        Freeze current attributes of namespace to prevent overriding via extend.
+        Freeze current attributes of namespace to prevent overriding via
+        extend.
 
         ..  code-block:: pycon
 

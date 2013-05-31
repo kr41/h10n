@@ -95,6 +95,8 @@ def translate_test():
 
 
 locales = {'en-US': {}, 'ru-RU': {}}
+
+
 def scan_test():
     """ h10n.translator.Translator: using scan """
     # As string
@@ -141,8 +143,10 @@ def thread_local_strategy_test():
     """ h10n.translator.Translator: using thread_local strategy """
     translator = Translator(strategy='thread_local',
                             locales={'en-US': {}, 'ru-RU': {}})
+
     def worker():
         translator.locale = 'en-US'
+
     translator.locale = 'ru-RU'
     thread = Thread(target=worker)
     thread.start()

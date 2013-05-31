@@ -2,10 +2,12 @@ from nose import tools
 
 from h10n.core import HelperNamespace
 
+
 class FakeLocale(object):
     lang = 'en'
     country = 'US'
     name = 'en-US'
+
 
 def base_test():
     """ h10n.core.HelperNamespace: basic functional """
@@ -15,6 +17,7 @@ def base_test():
     )
     tools.eq_(helper.pluralize(1), 0)
     tools.eq_(helper.pluralize(2), 1)
+
 
 def registry_test():
     """ h10n.core.HelperNamespace: using registry """

@@ -13,6 +13,7 @@ class Item(NamedObject):
     def error_method(self):
         raise Exception('Test context')
 
+
 class Container(NamedObject):
 
     def __init__(self, name, item):
@@ -41,6 +42,7 @@ def context_test():
     except Exception as e:
         context = e.args[-1]
     tools.eq_(repr(context), '<ExceptionContext: [<Container: 1>, <Item: 1>]>')
+
 
 def duplicate_test():
     """ h10n.util.ExceptionContext: prevent duplicates """

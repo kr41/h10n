@@ -47,7 +47,10 @@ logger = logging.getLogger(__name__)
 
 
 class YAMLSource(dict):
-    """ A message source, which extracts message definitions from YAML-files """
+    """
+    A message source, which extracts message definitions from YAML-files
+
+    """
     def __init__(self, path):
         with open(path) as f:
             self.update(yaml.load(f))

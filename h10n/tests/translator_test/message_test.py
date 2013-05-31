@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import sys
 from nose import tools
 
 from h10n.translator import Translator, Message

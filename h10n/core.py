@@ -28,8 +28,8 @@ class Locale(NamedObject):
     Locale itself doesn't use ``translator``, but it can be useful in the
     filters of :class:`Message` objects.
 
-    The ``catalogs`` argument should be a dictionary object, which store catalog
-    names in keys and arguments for :class:`Catalog` class in values.
+    The ``catalogs`` argument should be a dictionary object, which store
+    catalog names in keys and arguments for :class:`Catalog` class in values.
 
     Messages can be accessed using subscription interface.  It can be accessed
     directly using key in format ``{catalog}:{message}`` or via catalog:
@@ -90,13 +90,15 @@ class Catalog(NamedObject):
 
     The message definition should be a string or dictionary.  If it passed as
     string, it is converted to dictionary ``{'msg': 'passed string'}``.
-    Dictionary should contain keyword arguments to :class:`Message` constructor.
+    Dictionary should contain keyword arguments to :class:`Message`
+    constructor.
 
     When message is requested, using subscription interface, catalog redirects
     request to the message source.  If source return instance of
     :class:`Message`, this instance is returned as is.  If source return
     message definition, catalog extracts message prototype from locale,
-    creates :class:`Message` object, put it into source and return it as result.
+    creates :class:`Message` object, put it into source and return it as
+    result.
 
     Example:
 
@@ -186,8 +188,8 @@ class Message(NamedObject, Namespace):
     4.  The result code is executed with the ``helper`` argument in the local
         namespace.
 
-    The ``helper`` is a :class:`HelperNamespace` object, which will be available
-    in the filter as global name.
+    The ``helper`` is a :class:`HelperNamespace` object, which will be
+    available in the filter as global name.
 
     Example:
 
@@ -294,7 +296,8 @@ class HelperNamespace(Namespace):
     to the helper factory, similar to path using in the entry points from
     `pkg_resources`_, i.e. ``python.path.to.helper.module:HelperFactory``.
 
-    .. _`pkg_resources`: http://packages.python.org/distribute/pkg_resources.html
+    ..  _`pkg_resources`:
+        http://packages.python.org/distribute/pkg_resources.html
 
     Each helper and locale pair is registered in the internal class-level
     registry.  This mean, that two different Helper Namespace objects with
