@@ -242,7 +242,7 @@ class Message(NamedObject, Namespace):
                     prototype_call = ''
                 filter = filter.replace('__prototype__', prototype_call)
             filter = self._parser.sub(r'kw["\g<1>"]', filter)
-            filter = filter.split('\n')
+            filter = [line for line in filter.split('\n') if line.strip()]
             filter.insert(0, 'def filter(self, kw):')
             filter = '\n    '.join(filter)
             exec(filter, {'self': self, 'helper': helper}, self.__dict__)

@@ -54,17 +54,17 @@ def use_only_test():
     # As string
     translator = Translator(locales={'en-US': {}, 'ru-RU': {}},
                             use_only='ru-RU')
-    tools.eq_(list(translator.locales.keys()), ['ru-RU'])
+    tools.eq_(set(translator.locales.keys()), set(['ru-RU']))
 
     # As comma-separated string
     translator = Translator(locales={'en-US': {}, 'ru-RU': {}},
                             use_only='ru-RU, en-US')
-    tools.eq_(list(translator.locales.keys()), ['ru-RU', 'en-US'])
+    tools.eq_(set(translator.locales.keys()), set(['ru-RU', 'en-US']))
 
     # As list
     translator = Translator(locales={'en-US': {}, 'ru-RU': {}},
                             use_only=['ru-RU', 'en-US'])
-    tools.eq_(list(translator.locales.keys()), ['ru-RU', 'en-US'])
+    tools.eq_(set(translator.locales.keys()), set(['ru-RU', 'en-US']))
 
 
 def translate_test():
@@ -101,20 +101,20 @@ def scan_test():
     translator = Translator(
         scan='py://h10n.tests.translator_test.translator_test'
     )
-    tools.eq_(list(translator.locales.keys()), list(locales.keys()))
+    tools.eq_(set(translator.locales.keys()), set(locales.keys()))
 
     # As comma-separated
     translator = Translator(
         scan='py://h10n.tests.translator_test.translator_test, '
              'py://h10n.tests.translator_test.translator_test:locales'
     )
-    tools.eq_(list(translator.locales.keys()), list(locales.keys()))
+    tools.eq_(set(translator.locales.keys()), set(locales.keys()))
 
     # As list
     translator = Translator(
         scan=['py://h10n.tests.translator_test.translator_test']
     )
-    tools.eq_(list(translator.locales.keys()), list(locales.keys()))
+    tools.eq_(set(translator.locales.keys()), set(locales.keys()))
 
 
 def get_instance_test():

@@ -9,4 +9,4 @@ def test():
     path = os.path.join(os.path.dirname(__file__), 'assets/en-US/source.yaml')
     source = YAMLSource(path)
     tools.eq_(source['message'], 'Message')
-    tools.eq_(list(source.keys()), ['message'])
+    tools.eq_(set(source.keys()), set(['message']))
