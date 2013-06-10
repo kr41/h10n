@@ -1,7 +1,8 @@
 import os
-from setuptools import setup, find_packages
+from setuptools import setup
 
-version = '0.1b1'
+
+version = '0.2b1'
 here = os.path.abspath(os.path.dirname(__file__))
 README = open(os.path.join(here, 'README.rst')).read()
 CHANGES = open(os.path.join(here, 'CHANGES.rst')).read()
@@ -15,6 +16,7 @@ setup(
         "Programming Language :: Python",
         "Programming Language :: Python :: 2.6",
         "Programming Language :: Python :: 2.7",
+        "Programming Language :: Python :: 3.3",
         "Topic :: Software Development :: Internationalization",
         "Topic :: Software Development :: Localization",
         "Operating System :: OS Independent",
@@ -25,7 +27,7 @@ setup(
     author_email='self@kr41.net',
     url='https://bitbucket.org/kr41/h10n',
     download_url='https://bitbucket.org/kr41/h10n/downloads',
-    packages=find_packages(exclude=['ez_setup', 'examples', 'tests']),
+    packages=['h10n'],
     include_package_data=True,
     zip_safe=True,
     test_suite='nose.collector',
