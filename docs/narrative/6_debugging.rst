@@ -19,26 +19,24 @@ An output will be::
     ERROR:h10n.translator:Translation error ru-RU:test:error
     Traceback (most recent call last):
         ...
-    KeyError: ('test', <ExceptionContext: [<Locale: ru-RU>]>)
+    KeyError: 'test'
     DEBUG:h10n.translator:Fallback to en-GB
     ERROR:h10n.translator:Translation error en-GB:test:error
     Traceback (most recent call last):
         ...
-    KeyError: ('error', <ExceptionContext: [<Locale: en-GB>, <Catalog: test>]>)
+    KeyError: 'error'
     DEBUG:h10n.translator:Fallback to en-US
     ERROR:h10n.translator:Translation error en-US:test:error
     Traceback (most recent call last):
         ...
-    Exception: ('Raised from filter', <ExceptionContext: [<Message: error>]>)
+    Exception: 'Raised from filter'
 
 First of all, assertion passed.  So, our program is not broken, Translator used
 fallback message (second parameter passed
 to :meth:`h10n.translator.Translator.translate` method).
 
 In the log you can see three debug messages and three error ones with exception
-tracebacks.  The most interesting thing is a second argument of exception.
-It is an instance of :class:`h10n.util.ExceptionContext`, which stores
-"breadcrumbs" to the problem.
+tracebacks.
 
 First exception raised from ``ru-RU`` :term:`locale`, because it doesn't contain
 ``test`` :term:`catalog`.  Second one raised from ``en-GB:test`` catalog, because
