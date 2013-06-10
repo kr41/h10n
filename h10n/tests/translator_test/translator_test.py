@@ -3,7 +3,6 @@ from nose import tools
 from threading import Thread
 
 from h10n.translator import Translator
-from h10n.compat import u
 
 
 def default_locale_test():
@@ -79,7 +78,7 @@ def translate_test():
             },
             'ru-RU': {
                 'test': {
-                    'message':  u('Сообщение'),
+                    'message':  u'Сообщение',
                 }
             }
         },
@@ -87,7 +86,7 @@ def translate_test():
     )
     translator.locale = 'ru-RU'
 
-    tools.eq_(translator.translate('test:message', 'Message'), u('Сообщение'))
+    tools.eq_(translator.translate('test:message', 'Message'), u'Сообщение')
     tools.eq_(translator.translate('test:fallback', 'Fallback'),
               'Fallback Message')
     tools.eq_(translator.translate('test:invalid', 'Invalid Message'),
