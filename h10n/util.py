@@ -112,8 +112,7 @@ class Namespace(object):
 
 class NamedObject(object):
     """
-    An utility base class for named objects, which is used in the exception
-    context.  See :class:`ExceptionContext` doc-strings.
+    An utility base class for named objects, which are useful in debugging.
 
     ..  code-block:: pycon
 
@@ -130,59 +129,3 @@ class NamedObject(object):
 
     def __repr__(self):
         return '<{0}: {1}>'.format(self.__class__.__name__, self.name)
-
-
-class ExceptionContext(NamedObject):
-    """
-    An Exception Context is utility object to store context in the exception
-    arguments.  The Exception Context is used via :func:`keep_context`
-    decorator.
-    """
-
-    def __init__(self, obj):
-        self.chain = [obj]
-
-    @property
-    def name(self):
-        return repr(self.chain)
-
-    @classmethod
-    def extend(cls, exception, obj):
-        """ Extends existent context of exception or add new one """
-        # Search for existent context in exception arguments
-        for arg in reversed(exception.args):
-            if isinstance(arg, cls):
-                if obj not in arg.chain:
-                    arg.chain.insert(0, obj)
-                raise
-        # Create new context and add it to the end of exception's arguments
-        exception.args += (cls(obj),)
-        raise
-
-
-def keep_context(method):
-    """
-    Includes context into exception raised from decorated method.
-
-    ..  code-block:: pycon
-
-        >>> class Test(NamedObject):
-        ...     def __init__(self, name):
-        ...         self.name = name
-        ...     @keep_context
-        ...     def test(self):
-        ...         raise Exception('Test exception')
-        >>> Test('foo').test()
-        Traceback (most recent call last):
-        ...
-        Exception: ('Test exception', <ExceptionContext: [<Test: foo>]>)
-
-    """
-    def context_keeper(self, *args, **kwargs):
-        try:
-            return method(self, *args, **kwargs)
-        except Exception as e:
-            ExceptionContext.extend(e, self)
-    context_keeper.__name__ = method.__name__
-    context_keeper.__doc__ = method.__doc__
-    return context_keeper

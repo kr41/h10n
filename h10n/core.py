@@ -8,7 +8,6 @@ import pkg_resources
 from textwrap import dedent
 from threading import RLock
 
-from h10n.util import keep_context
 from h10n.util import NamedObject, Namespace
 from h10n.compat import strtypes
 
@@ -46,7 +45,6 @@ class Locale(NamedObject):
 
     """
 
-    @keep_context
     def __init__(self, name, translator=None, catalogs=None):
         self.name = name
         self.translator = translator
@@ -55,7 +53,6 @@ class Locale(NamedObject):
         for catalog_name, catalog in catalogs.items():
             self.catalogs[catalog_name] = Catalog(catalog_name, self, catalog)
 
-    @keep_context
     def __getitem__(self, name):
         if ':' in name:
             name, tail = name.split(':', 1)
@@ -116,7 +113,6 @@ class Catalog(NamedObject):
         {'test': <Message: test>}
     """
 
-    @keep_context
     def __init__(self, name, locale, config):
         self.name = name
         self.locale = locale
@@ -132,7 +128,6 @@ class Catalog(NamedObject):
         except KeyError:
             self.helper = None
 
-    @keep_context
     def __getitem__(self, name):
         message = self.source[name]
         if not isinstance(message, Message):
@@ -214,7 +209,6 @@ class Message(NamedObject, Namespace):
 
     _parser = re.compile('\$([a-z_]{1}[a-z_0-9]*)', re.I)
 
-    @keep_context
     def __init__(self, name='__empty__', locale=None, prototype=None,
                  key=None, msg=None, defaults=None, filter=None, helper=None,
                  **properties):
@@ -249,7 +243,6 @@ class Message(NamedObject, Namespace):
             filter = '\n    '.join(filter)
             exec(filter, {'self': self, 'helper': helper}, self.__dict__)
 
-    @keep_context
     def format(self, **kw):
         """
         Format translation string according to passed parameters.
