@@ -1,0 +1,128 @@
+#!/bin/bash
+
+##
+# Yep, I prefer Bash rather than Make.
+##
+
+##
+# Global variables
+#
+PROJECT_NAME="h10n"
+PROJECT_DIR="h10n"
+VIRTUAL_ENV_PREFIX=~/.virtualenvs/h10n-
+VERBOSITY=2
+LOG_PREFIX="manage:"
+
+
+##
+# Commands
+#
+
+# Print help for this script
+function help {
+    echo "Some useful info"
+}
+
+# Remove python compiled files from project forlder
+function clean {
+    _info "Clean up project directory"
+    find ./$PROJECT -name "*.pyc" -exec rm {} \;
+}
+
+# Run tests against version
+function test {
+    PY_VERSION=$1
+    [[ -z "$PY_VERSION" ]] && PY_VERSION="py33 py27 py26 pypy"
+    for V in $PY_VERSION
+    do
+        _info "Use Python $V"
+        ENV="${VIRTUAL_ENV_PREFIX}${V}"
+
+        clean
+
+        _info "Run Flake8"
+        $ENV/bin/flake8 $PROJECT_DIR || _die $? "FAIL"
+
+        _info "Run Nose tests"
+        $ENV/bin/nosetests || _die $? "FAIL"
+
+        _info "Run Example tests"
+        export PYTHON_VENV_PATH="$ENV/bin/python"
+        cd docs/_static/examples
+        ./test.sh || _die $? "FAIL"
+        cd $OLDPWD
+
+        _info "SUCCESS"
+    done
+}
+
+# Install developing dependencies
+function deps {
+    PY_VERSION=$1
+    [[ -z "$PY_VERSION" ]] && PY_VERSION="py33 py27 py26 pypy"
+    for V in $PY_VERSION
+    do
+        _info "Use Python $V"
+        ENV="${VIRTUAL_ENV_PREFIX}${V}"
+
+        _info "Install developing dependencies"
+        $ENV/bin/pip install nose flake8 || _die $? "FAIL"
+
+        _info "SUCCESS"
+    done
+}
+
+# Setup library in developing mode
+function setup {
+    PY_VERSION=$1
+    [[ -z "$PY_VERSION" ]] && PY_VERSION="py33 py27 py26 pypy"
+    for V in $PY_VERSION
+    do
+        _info "Use Python $V"
+        ENV="${VIRTUAL_ENV_PREFIX}${V}"
+
+        _info "Setup library in developing mode"
+        $ENV/bin/python setup.py develop || _die $? "FAIL"
+
+        _info "SUCCESS"
+    done
+}
+
+
+##
+# Utility functions
+#
+
+# Log message
+function _log {
+    LEVEL=$1
+    shift
+    [[ $LEVEL -ge $VERBOSITY ]] && echo $LOG_PREFIX `date -R` $* >&2
+}
+
+# Log debug message
+function _debug {
+    _log 1 '[DEBUG]' $*
+}
+
+# Log info message
+function _info {
+    _log 2 '[INFO]' $*
+}
+
+# Log error message and exit
+function _die {
+    CODE=$1
+    shift
+    _log 3 '[ERROR]' $*
+    exit $CODE
+}
+
+
+##
+# Run command
+#
+CMD=$1
+[[ -z "$CMD" ]] && CMD='help'
+shift
+$CMD "$@"
