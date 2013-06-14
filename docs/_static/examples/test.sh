@@ -2,6 +2,11 @@
 
 echo "Test examples:"
 
+if [[ -z "$PYTHON_VENV_PATH" ]]
+then
+    PYTHON_VENV_PATH='python'
+fi
+
 OK=0
 FAIL=0
 for APP in `find -name "app*.py" | sort`
@@ -9,7 +14,7 @@ do
     echo -en "\t$APP ... "
     cd `dirname $APP`
     APP=`basename $APP`
-    OUTPUT=`python $APP 2>&1`
+    OUTPUT=`$PYTHON_VENV_PATH $APP 2>&1`
     if [[ $? -eq 0 ]]
     then
         echo 'Ok'
@@ -26,9 +31,4 @@ done
 
 echo "Passed: $OK"
 echo "Failed: $FAIL"
-if [[ $FAIL -eq 0 ]]
-then
-    echo "Ok"
-else
-    echo "Fail"
-fi
+[[ $FAIL -eq 0 ]] || exit 1
