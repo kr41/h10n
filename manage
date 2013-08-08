@@ -40,8 +40,11 @@ function test {
 
         clean
 
-        _info "Run Flake8"
-        $ENV/bin/flake8 $PROJECT_DIR || _die $? "FAIL"
+        if [[ $V != 'pypy' ]]   # Because flake8 crashes on PyPy
+        then
+            _info "Run Flake8"
+            $ENV/bin/flake8 $PROJECT_DIR || _die $? "FAIL"
+        fi
 
         _info "Run Nose tests"
         $ENV/bin/nosetests || _die $? "FAIL"
