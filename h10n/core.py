@@ -5,6 +5,7 @@ don't need to use this module directly.
 
 import re
 import pkg_resources
+import weakref
 from textwrap import dedent
 from threading import RLock
 
@@ -46,8 +47,8 @@ class Locale(NamedObject):
     """
 
     def __init__(self, name, translator=None, catalogs=None):
+        self._translator = _get_weakref(translator)
         self.name = name
-        self.translator = translator
         self.lang, self.country = name.split('-')
         self.catalogs = {}
         for catalog_name, catalog in catalogs.items():
@@ -58,6 +59,10 @@ class Locale(NamedObject):
             name, tail = name.split(':', 1)
             return self.catalogs[name][tail]
         return self.catalogs[name]
+
+    @property
+    def translator(self):
+        return self._translator()
 
 
 class Catalog(NamedObject):
@@ -115,7 +120,7 @@ class Catalog(NamedObject):
 
     def __init__(self, name, locale, config):
         self.name = name
-        self.locale = locale
+        self._locale = _get_weakref(locale)
         self._mutex = RLock()
         if 'factory' in config and callable(config['factory']):
             factory = config.pop('factory', None)
@@ -142,6 +147,10 @@ class Catalog(NamedObject):
                                                       helper=self.helper,
                                                       **message)
         return message
+
+    @property
+    def locale(self):
+        return self._locale()
 
 
 class Message(NamedObject, Namespace):
@@ -213,7 +222,7 @@ class Message(NamedObject, Namespace):
                  key=None, msg=None, defaults=None, filter=None, helper=None,
                  **properties):
         self.name = name
-        self.locale = locale
+        self._locale = _get_weakref(locale)
         self.key = key
         self.msg = msg
         self.filter = None
@@ -272,6 +281,10 @@ class Message(NamedObject, Namespace):
             msg = msg[key]
         return msg.format(**params)
 
+    @property
+    def locale(self):
+        return self._locale()
+
 
 class HelperNamespace(Namespace):
     """
@@ -323,3 +336,7 @@ class HelperNamespace(Namespace):
                                                              locale.country)
             properties[alias] = cls._registry[locale.name, helper]
         self.extend(properties)
+
+
+def _get_weakref(obj, callback=None):
+    return (lambda: None) if obj is None else weakref.ref(obj, callback)

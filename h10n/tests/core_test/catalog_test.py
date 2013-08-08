@@ -5,8 +5,11 @@ from h10n.core import Catalog, Message
 
 def compile_message_test():
     """ h10n.core.Catalog: compile message """
+    class FakeLocale(dict):
+        """ Locale class should be weak referenceable """
+
     prototype = Message(msg='Prototype')
-    fake_locale = {'other_catalog:prototype': prototype}
+    fake_locale = FakeLocale({'other_catalog:prototype': prototype})
     catalog = Catalog('Test', fake_locale, {
         'short': 'Short specification of message',
         'full': {
